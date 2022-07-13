@@ -1,0 +1,160 @@
+*{
+  box-sizing: border-box;
+  font-family: arial;
+}
+
+#selectContainer{
+  width: 300px;
+  height: 40px;
+  margin: 15px auto;
+  text-align: center;
+}
+
+.selectCharacter{
+  width: 50%;
+  height: 100%;
+  display: inline-block;
+  float: left;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+input{
+  display: none;
+}
+
+#map{
+  width: 500px;
+  height: 500px;
+  text-align: center;
+  font-size: 0;
+  margin: 15px auto;
+  padding: 70px 125px 180px;
+  background-image: url('images/computer.png');
+  background-size: cover;
+  position: relative;
+}
+
+div button{
+  width: calc(33.33% - 2.6px);
+  height: calc(33.33% - 2.6px);
+  border: 0;
+  padding: 10px;
+  background-color: transparent;
+}
+
+.bottomBorder{
+  height: calc(33.33% + 1.3px);
+  border-bottom: 4px solid black;
+}
+
+.rightBorder{
+  width: calc(33.33% + 1.3px);
+  border-right: 4px solid black;
+}
+
+#result{
+  position: absolute;
+  bottom: 88px;
+  left: 0;
+  width: 100%;
+  color: white;
+  text-align: center;
+  font-size: 20px;
+}
+
+#restart{
+  position: absolute;
+  bottom: 0;
+  left: 110px;
+  width: 280px;
+  height: 50px;
+  font-size: 20px;
+  color: white;
+}
+
+.vertical, .horizontal, #diagonal1, #diagonal2{
+  position: absolute;
+  top: 70px;
+  left: 125px;
+}
+
+.vertical{
+  top: 190px;
+}
+
+.vertical, #diagonal2{
+  transform: rotate(90deg);
+}
+
+#robot, #human{
+  position: absolute;
+  bottom: 0;
+  transition: width 0.2s, height 0.2s, opacity 0.2s;
+}
+
+#robot{
+  left: 75px;
+  opacity: 0.5;
+}
+
+#human{
+  right: 75px;
+}
+
+@media only screen and (max-width: 768px){
+  #selectContainer{
+    width: 80vw;
+  }
+
+  #map{
+    width: 90vw;
+    height: 90vw;
+    margin-top: 0;
+    padding: 12vw 22.5vw 33vw;
+  }
+
+  div button{
+    padding: 8px;
+  }
+
+  #result{
+    bottom: 14vw;
+  }
+
+  #restart{
+    width: 50vw;
+    height: 9.5vw;
+    left: 20vw;
+  }
+
+  .vertical, .horizontal{
+    height: 8px;
+  }
+
+  #diagonal1, #diagonal2{
+    height: 45vw;
+  }
+
+  .vertical, .horizontal, #diagonal1, #diagonal2{
+    width: 45vw;
+    top: 12vw;
+    left: 22.5vw;
+  }
+
+  .vertical{
+    top: 33.5vw;
+  }
+
+  #robot{
+    width: 35vw;
+    height: 48vw;
+    left: 10vw;
+  }
+
+  #human{
+    width: 45vw;
+    height: 58vw;
+    right: 10vw;
+  }
+}

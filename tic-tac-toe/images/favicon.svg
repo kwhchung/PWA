@@ -1,0 +1,8 @@
+<svg xmlns = "http://www.w3.org/2000/svg"  width = "230px" height = "230px">
+  <circle cx = "60px" cy = "60px" r = "40px" stroke = "black" stroke-width = "15px" fill-opacity = "0"/>
+  <line x1 = "130px" y1 = "20px" x2 = "210px" y2 = "100px" stroke = "black" stroke-width = "15px" stroke-linecap = "round"/>
+  <line x1 = "130px" y1 = "100px" x2 = "210px" y2 = "20px" stroke = "black" stroke-width = "15px" stroke-linecap = "round"/>
+  <line x1 = "20px" y1 = "130px" x2 = "100px" y2 = "210px" stroke = "black" stroke-width = "15px" stroke-linecap = "round"/>
+  <line x1 = "20px" y1 = "210px" x2 = "100px" y2 = "130px" stroke = "black" stroke-width = "15px" stroke-linecap = "round"/>
+  <circle cx = "170px" cy = "170px" r = "40px" stroke = "black" stroke-width = "15px" fill-opacity = "0"/>
+</svg>

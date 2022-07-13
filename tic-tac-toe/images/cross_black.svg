@@ -1,0 +1,4 @@
+<svg xmlns = "http://www.w3.org/2000/svg"  width = "100px" height = "100px">
+  <line x1 = "10px" y1 = "10px" x2 = "90px" y2 = "90px" stroke = "black" stroke-width = "15px" stroke-linecap = "round"/>
+  <line x1 = "10px" y1 = "90px" x2 = "90px" y2 = "10px" stroke = "black" stroke-width = "15px" stroke-linecap = "round"/>
+</svg>
