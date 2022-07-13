@@ -102,6 +102,20 @@ div button{
   right: 75px;
 }
 
+@media only screen and (max-width: 1279px){
+  #robot{
+    width: 18vw;
+    height: 24vw;
+    left: 50px;
+  }
+
+  #human{
+    width: 20vw;
+    height: 27vw;
+    right: 50px;
+  }
+}
+
 @media only screen and (max-width: 768px){
   #selectContainer{
     width: 80vw;
