@@ -1,0 +1,110 @@
+*{
+  box-sizing: border-box;
+}
+
+main{
+  width: 900px;
+  height: 700px;
+  margin: 20px auto;
+  background-color: DarkGreen;
+  padding: 15px 30px;
+  position: relative;
+}
+
+table{
+  border-spacing: 0;
+  overflow: visible;
+}
+
+td{
+  width: 120px;
+  height: 130px;
+  padding: 10px 22.5px;
+}
+
+.stack{
+  position: relative;
+}
+
+.droppable{
+  width: 120px;
+  padding: 10px 22.5px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.place{
+  width: 75px;
+  height: 110px;
+  border: 1px solid grey;
+  border-radius: 5px;
+  position: relative;
+}
+
+#end{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  overflow: hidden;
+}
+
+#selectMode{
+  font-size: 20px;
+  text-align: center;
+}
+
+#mode{
+  font-size: 20px;
+}
+
+#restart{
+  font-size: 20px;
+  margin-left: 20px;
+}
+
+#ghost{
+  width: 75px;
+  height: 110px;
+  position: absolute;
+  top: 0;
+  left: -200px;
+}
+
+#ghostPlace{
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+@media only screen and (max-width: 768px){
+  body{
+    margin: 0;
+  }
+
+  main{
+    width: 100vw;
+    height: 80vh;
+    margin-top: 0;
+    padding: 3px;
+  }
+
+  td{
+    width: calc((100vw - 6px) / 7);
+    height: calc((100vw - 6px) / 5 + 24px);
+    padding: 15px 3px;
+  }
+
+  .droppable{
+    width: calc((100vw - 6px) / 7);
+    padding: 15px 3px;
+  }
+
+  .place, #ghost{
+    width: calc((100vw - 6px) / 7 - 6px);
+    height: calc((100vw - 6px) / 5 - 6px);
+  }
+}
