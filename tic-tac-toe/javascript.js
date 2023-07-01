@@ -1,110 +1,160 @@
+// initialize the map of the 9 cells to 0
 const map = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+// corner cells, used for the computer round
 const corners = [[0, 0], [0, 2], [2, 0], [2, 2]];
+// id for timeout of computer round
 let computerRound = 0;
+
+// register service worker to enable PWA features
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("sw.js").catch(() => console.log("failed"));
 }
 
+// set the verticle and horizontal lines to locate at the center of the grid cells
+// offsetWidth / offsetHeight = content + padding + border
+// clientWidth / clientHeight = content + padding
+// offsetTop = top position in parent element
+let verticals = document.getElementsByClassName("vertical");
+let horizontals = document.getElementsByClassName("horizontal");
+let buttons = document.getElementById("map").getElementsByTagName("button");
+let buttonWidth = buttons[0].offsetWidth;
+let buttonHeight = buttons[0].offsetHeight;
 for(let i = 0; i < 3; i ++){
-  document.getElementsByClassName("vertical")[i].style.left = (i * document.getElementById("map").getElementsByTagName("button")[0].offsetWidth + document.getElementById("map").getElementsByTagName("button")[i].clientWidth / 2) + "px";
-  document.getElementsByClassName("horizontal")[i].style.top = (i * document.getElementById("map").getElementsByTagName("button")[0].offsetHeight + document.getElementById("map").getElementsByTagName("button")[i * 3].clientHeight / 2 + document.getElementById("map").getElementsByTagName("button")[0].offsetTop - document.getElementsByClassName("horizontal")[i].offsetHeight / 2) + "px";
-  document.getElementsByClassName("vertical")[i].style.display = "none";
-  document.getElementsByClassName("horizontal")[i].style.display = "none";
+  // calculate the left position of vertical lines different to horizontal lines as they are rotated by the center point, the position before rotation should be calculated
+  verticals[i].style.left = (i * buttonWidth + buttons[i].clientWidth / 2) + "px";
+  horizontals[i].style.top = (i * buttonHeight + buttons[i * 3].clientHeight / 2 + buttons[0].offsetTop - horizontals[i].offsetHeight / 2) + "px";
+  // hide the vertical and horizontal lines, display them after one of the player wins
+  verticals[i].style.display = "none";
+  horizontals[i].style.display = "none";
 }
-document.getElementById("diagonal1").style.display = "none";
-document.getElementById("diagonal2").style.display = "none";
 
-function changeCharacter(i){
+// when user press the other selectCharacter button, the game restarts with the other player plays first
+const changeCharacter = i => {
+  let selectCharacter = document.getElementsByClassName("selectCharacter");
+  let inputs = document.getElementsByTagName("input");
+  let images = document.getElementsByTagName("img");
   restart();
-  document.getElementsByClassName("selectCharacter")[i].style = "background-color: black";
-  document.getElementsByTagName("input")[i].disabled = true;
-  document.getElementsByTagName("img")[i].src = document.getElementsByTagName("img")[i].src.replace("black", "white");
-  document.getElementsByClassName("selectCharacter")[1 - i].style = "";
-  document.getElementsByTagName("input")[1 - i].disabled = false;
-  document.getElementsByTagName("img")[1 - i].src = document.getElementsByTagName("img")[1 - i].src.replace("white", "black");
+  // change the display and disability of the character buttons
+  selectCharacter[i].style = "background-color: black";
+  inputs[i].disabled = true;
+  images[i].src = images[i].src.replace("black", "white");
+  selectCharacter[1 - i].style = "";
+  inputs[1 - i].disabled = false;
+  images[1 - i].src = images[1 - i].src.replace("white", "black");
 }
 
-function changeRound(i){
-  let width = document.getElementById("human").offsetWidth;
-  let height = document.getElementById("human").offsetHeight;
-  document.getElementById("human").style.width = document.getElementById("robot").offsetWidth + "px";
-  document.getElementById("human").style.height = document.getElementById("robot").offsetHeight + "px";
-  document.getElementById("robot").style.width = width + "px";
-  document.getElementById("robot").style.height = height + "px";
-  if(i == 0){
-    document.getElementById("human").style.opacity = "0.5";
-    document.getElementById("robot").style.opacity = "1";
+// swap the width, height and opacity of the human and robot to indicate switching of player
+// i = player, 1 = change to computer, 2 = change to player
+const changeRound = i => {
+  let human = document.getElementById("human");
+  let robot = document.getElementById("robot");
+  let width = human.offsetWidth;
+  let height = human.offsetHeight;
+  human.style.width = robot.offsetWidth + "px";
+  human.style.height = robot.offsetHeight + "px";
+  robot.style.width = width + "px";
+  robot.style.height = height + "px";
+  if(i == 1){
+    human.style.opacity = "0.5";
+    robot.style.opacity = "1";
   }else{
-    document.getElementById("robot").style.opacity = "0.5";
-    document.getElementById("human").style.opacity = "1";
+    robot.style.opacity = "0.5";
+    human.style.opacity = "1";
   }
 }
 
-function gameRound(i, j){
+// perform the operations for a game round, such as updating the grid cells or checking if the game ends
+// i = row, j = column, 0 <= i, j <= 2
+const gameRound = (i, j) => {
+  let inputs = document.getElementsByTagName("input");
+  let buttons = document.getElementById("map").getElementsByTagName("button");
+  let result = document.getElementById("result");
+  // 1 = player
   map[i][j] = 1;
-  if(document.getElementsByTagName("input")[0].checked == true){
-    document.getElementsByTagName("button")[i * 3 + j].innerHTML = "<img src = 'images/cross_black.svg' width = '100%' height = '100%'>";
+  // display the X or O of the clicked cell
+  // inputs[0].clicked = player is X, otherwise = player is O
+  if(inputs[0].checked == true){
+    buttons[i * 3 + j].innerHTML = "<img src = 'images/cross_black.svg' width = '100%' height = '100%'>";
   }else{
-    document.getElementsByTagName("button")[i * 3 + j].innerHTML = "<img src = 'images/circle_black.svg' width = '100%' height = '100%'>";
+    buttons[i * 3 + j].innerHTML = "<img src = 'images/circle_black.svg' width = '100%' height = '100%'>";
   }
-  document.getElementsByTagName("button")[i * 3 + j].disabled = true;
+  buttons[i * 3 + j].disabled = true;
+  // end the game if the player wins
   if(win(1)){
-    document.getElementById("result").innerHTML = "You win!";
+    result.innerHTML = "You win!";
     for(let i = 0; i < 9; i ++){
-      document.getElementsByTagName("button")[i].disabled = true;
+      buttons[i].disabled = true;
     }
     return;
   }
+  // end the game if it draws
   if(draw()){
-    document.getElementById("result").innerHTML = "Draw";
+    result.innerHTML = "Draw";
     return;
   }
+  // disable the buttons for the computer round
   for(let i = 0; i < 9; i ++){
-    document.getElementsByTagName("button")[i].disabled = true;
+    buttons[i].disabled = true;
   }
-  changeRound(0);
-  computerRound = setTimeout(function(){
+  // change the display for the human and robot
+  changeRound(1);
+  // delay for 0.75s before the computer give its choice
+  computerRound = setTimeout(() => {
     let pos = computer();
+    // 2 = computer
     map[pos[0]][pos[1]] = 2;
-    if(document.getElementsByTagName("input")[0].checked == true){
-      document.getElementsByTagName("button")[pos[0] * 3 + pos[1]].innerHTML = "<img src = 'images/circle_black.svg' width = '100%' height = '100%'>";
+    // display the X or O of the clicked cell
+    // inputs[0].clicked = computer is O, otherwise = computer is X
+    if(inputs[0].checked == true){
+      buttons[pos[0] * 3 + pos[1]].innerHTML = "<img src = 'images/circle_black.svg' width = '100%' height = '100%'>";
     }else{
-      document.getElementsByTagName("button")[pos[0] * 3 + pos[1]].innerHTML = "<img src = 'images/cross_black.svg' width = '100%' height = '100%'>";
+      buttons[pos[0] * 3 + pos[1]].innerHTML = "<img src = 'images/cross_black.svg' width = '100%' height = '100%'>";
     }
-    document.getElementsByTagName("button")[pos[0] * 3 + pos[1]].disabled = true;
+    buttons[pos[0] * 3 + pos[1]].disabled = true;
+    // end the game if the computer wins
     if(win(2)){
-      document.getElementById("result").innerHTML = "You lose!";
+      result.innerHTML = "You lose!";
       for(let i = 0; i < 9; i ++){
-        document.getElementsByTagName("button")[i].disabled = true;
-        return;
+        buttons[i].disabled = true;
       }
-    }
-    if(draw()){
-      document.getElementById("result").innerHTML = "Draw";
       return;
     }
+    // end the game if it draws
+    if(draw()){
+      result.innerHTML = "Draw";
+      return;
+    }
+    // enable the empty buttons for the player round
     for(let i = 0; i < 3; i ++){
       for(let j = 0; j < 3; j ++){
         if(map[i][j] == 0){
-          document.getElementsByTagName("button")[i * 3 + j].disabled = false;
+          buttons[i * 3 + j].disabled = false;
         }
       }
     }
-    changeRound(1);
+    // change the display for the human and robot
+    changeRound(2);
   }, 750);
 }
 
+// check if the player or computer wins
+// 1 = player, 2 = computer
 function win(n){
+  let verticals = document.getElementsByClassName("vertical");
+  let horizontals = document.getElementsByClassName("horizontal");
+  // if all the cells of that row is occupied by the character, display the horizontal line of that row
   for(let i = 0; i < 3; i ++){
     if(map[i][0] == n && map[i][1] == n && map[i][2] == n){
-      document.getElementsByClassName("horizontal")[i].style.display = "block";
+      horizontals[i].style.display = "block";
       return true;
     }
+    // if all the cells of that column is occupied by the character, display the horizontal line of that column
     if(map[0][i] == n && map[1][i] == n && map[2][i] == n){
-      document.getElementsByClassName("vertical")[i].style.display = "block";
+      verticals[i].style.display = "block";
       return true;
     }
   }
+  // if all the cells of that diagonal is occupied by the character, display the line of that diagonal
   if(map[0][0] == n && map[1][1] == n && map[2][2] == n){
     document.getElementById("diagonal1").style.display = "block";
     return true;
@@ -116,6 +166,8 @@ function win(n){
   return false;
 }
 
+// determine the step for the computer round
+// should be modified to determine the step by AI algorithms
 function computer(){
   let count = 0;
   for(let i = 0; i < 3; i ++){
@@ -229,7 +281,9 @@ function computer(){
   }
 }
 
+// check if the game draws
 function draw(){
+  // if all cells are occupied by the player or computer, the game draws
   let count = 0;
   for(let i = 0; i < 3; i ++){
     for(let j = 0; j < 3; j ++){
@@ -238,14 +292,14 @@ function draw(){
       }
     }
   }
-  if(count == 0){
-    return true;
-  }
-  return false;
+  return count == 0;
 }
 
+// restart the game
 function restart(){
+  // cancel the delayed step of the computer round
   clearTimeout(computerRound);
+  // clear the game progress and remove any lines displayed if the player or computer wins
   document.getElementById("diagonal1").style.display = "none";
   document.getElementById("diagonal2").style.display = "none";
   for(let i = 0; i < 3; i ++){
@@ -255,11 +309,13 @@ function restart(){
       map[i][j] = 0;
     }
   }
+  // remove any cross or circle displayed in the buttons
   for(let i = 0; i < 9; i ++){
     document.getElementsByTagName("button")[i].innerHTML = "";
     document.getElementsByTagName("button")[i].disabled = false;
   }
   document.getElementById("result").innerHTML = "";
+  // if the computer starts first, start the game automatically
   if(document.getElementsByTagName("input")[1].checked == true){
     for(let i = 0; i < 9; i ++){
       document.getElementsByTagName("button")[i].disabled = true;
@@ -267,17 +323,27 @@ function restart(){
     if(document.getElementById("human").offsetWidth > document.getElementById("robot").offsetWidth){
       changeRound(0);
     }
+    // delay for 0.75s before the computer give its choice
     computerRound = setTimeout(function(){
+      // pick a random number between 0 - 8
       let i = Math.floor(Math.random() * 9);
+      // computer will only choose the corners or the middle cell
       if(i >= 4){
+        // computer choose the middle cell
+        // 2 = computer
         map[1][1] = 2;
+        // display the X of the clicked cell
         document.getElementsByTagName("button")[4].innerHTML = "<img src = 'images/cross_black.svg' width = '100%' height = '100%'>";
         document.getElementsByTagName("button")[4].disabled = true;
       }else{
+        // computer choose the corner cell
+        // 2 = computer
         map[corners[i][0]][corners[i][1]] = 2;
+        // display the X of the clicked cell
         document.getElementsByTagName("button")[corners[i][0] * 3 + corners[i][1]].innerHTML = "<img src = 'images/cross_black.svg' width = '100%' height = '100%'>";
         document.getElementsByTagName("button")[corners[i][0] * 3 + corners[i][1]].disabled = true;
       }
+      // enable the empty buttons for the player round
       for(let i = 0; i < 3; i ++){
         for(let j = 0; j < 3; j ++){
           if(map[i][j] == 0){
@@ -286,10 +352,12 @@ function restart(){
         }
       }
       if(document.getElementById("robot").offsetWidth > document.getElementById("human").offsetWidth){
+        // change the display for the human and robot
         changeRound(1);
       }
     }, 750);
   }else if(document.getElementById("robot").offsetWidth > document.getElementById("human").offsetWidth){
+    // change the display for the human and robot
     changeRound(1);
   }
 }
