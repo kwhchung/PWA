@@ -1,11 +1,19 @@
+:root{
+  --select-width: 80vw;
+  --map-width: 90vw;
+  --robot-width: 40vw;
+  --human-width: 50vw;
+  --margin: 5vw;
+}
+
 *{
   box-sizing: border-box;
   font-family: arial;
 }
 
 #selectContainer{
-  width: 300px;
-  height: 40px;
+  width: var(--select-width);
+  height: calc(var(--map-width) / 10);
   margin: 15px auto;
   text-align: center;
 }
@@ -15,8 +23,8 @@
   height: 100%;
   display: inline-block;
   float: left;
-  padding: 10px;
-  border-radius: 20px;
+  padding: calc(var(--map-width) / 40);
+  border-radius: calc(var(--map-width) / 20);
 }
 
 input{
@@ -24,63 +32,80 @@ input{
 }
 
 #map{
-  width: 500px;
-  height: 500px;
+  width: var(--map-width);
+  height: var(--map-width);
   text-align: center;
   font-size: 0;
-  margin: 15px auto;
-  padding: 70px 125px 180px;
+  margin: 0 auto 15px;
+  padding: calc(var(--map-width) * 0.135) calc(var(--map-width) / 4) calc(var(--map-width) * 0.365);
   background-image: url('images/computer.png');
   background-size: cover;
   position: relative;
 }
 
 div button{
-  width: calc(33.33% - 2.6px);
-  height: calc(33.33% - 2.6px);
+  width: calc((100% / 3) - (calc(var(--map-width) / 100) * 2 / 3));
+  height: calc((100% / 3) - (calc(var(--map-width) / 100) * 2 / 3));
   border: 0;
-  padding: 10px;
+  padding: calc(var(--map-width) / 50);
   background-color: transparent;
 }
 
 .bottomBorder{
-  height: calc(33.33% + 1.3px);
-  border-bottom: 4px solid black;
+  height: calc((100% / 3) + (calc(var(--map-width) / 100) / 3));
+  border-bottom: calc(var(--map-width) / 100) solid black;
 }
 
 .rightBorder{
-  width: calc(33.33% + 1.3px);
-  border-right: 4px solid black;
+  width: calc((100% / 3) + (calc(var(--map-width) / 100) / 3));
+  border-right: calc(var(--map-width) / 100) solid black;
 }
 
 #result{
   position: absolute;
-  bottom: 88px;
+  bottom: calc(var(--map-width) * 0.155);
   left: 0;
   width: 100%;
   color: white;
   text-align: center;
-  font-size: 20px;
+  font-size: calc(var(--map-width) / 20);
 }
 
 #restart{
   position: absolute;
   bottom: 0;
-  left: 110px;
-  width: 280px;
-  height: 50px;
-  font-size: 20px;
+  left: calc(var(--map-width) * 0.225);
+  width: calc(var(--map-width) * 0.55);
+  height: calc(var(--map-width) / 10);
+  padding: calc(var(--map-width) / 40);
+  font-size: calc(var(--map-width) / 20);
   color: white;
+}
+
+.vertical, .horizontal{
+  height: calc(var(--map-width) / 50);
+}
+
+#diagonal1, #diagonal2{
+  height: calc(var(--map-width) / 2);
 }
 
 .vertical, .horizontal, #diagonal1, #diagonal2{
   position: absolute;
-  top: 70px;
-  left: 125px;
+  width: calc(var(--map-width) / 2);
+}
+
+.horizontal, #diagonal1, #diagonal2{
+  left: calc(var(--map-width) / 4);
 }
 
 .vertical{
-  top: 190px;
+  top: calc(var(--map-width) * 0.13 + var(--map-width) / 4);
+}
+
+#diagonal1, #diagonal2{
+  top: calc(var(--map-width) * 0.13);
+  display: none;
 }
 
 .vertical, #diagonal2{
@@ -94,81 +119,95 @@ div button{
 }
 
 #robot{
-  left: 75px;
+  width: var(--robot-width);
+  height: calc(var(--robot-width) * 4 / 3);
+  left: var(--margin);
   opacity: 0.5;
 }
 
 #human{
-  right: 75px;
+  width: var(--human-width);
+  height: calc(var(--human-width) * 4 / 3);
+  right: var(--margin);
 }
 
-@media only screen and (max-width: 1279px){
-  #robot{
-    width: 18vw;
-    height: 24vw;
-    left: 50px;
-  }
-
-  #human{
-    width: 20vw;
-    height: 27vw;
-    right: 50px;
+@media only screen and (min-aspect-ratio: 0.5){
+  :root{
+    --select-width: 70vw;
+    --map-width: 80vw;
+    --robot-width: 31vw;
+    --human-width: 39vw;
   }
 }
 
-@media only screen and (max-width: 768px){
-  #selectContainer{
-    width: 80vw;
+@media only screen and (min-aspect-ratio: 0.6){
+  :root{
+    --select-width: 60vw;
+    --map-width: 70vw;
+    --robot-width: 27vw;
+    --human-width: 33vw;
   }
+}
 
-  #map{
-    width: 90vw;
-    height: 90vw;
-    margin-top: 0;
-    padding: 12vw 22.5vw 33vw;
+@media only screen and (min-aspect-ratio: 0.7){
+  :root{
+    --select-width: 55vw;
+    --map-width: 65vw;
+    --robot-width: 23vw;
+    --human-width: 27vw;
   }
+}
 
-  div button{
-    padding: 8px;
+@media only screen and (min-aspect-ratio: 0.85){
+  :root{
+    --select-width: 50vw;
+    --map-width: 60vw;
+    --robot-width: 20vw;
+    --human-width: 25vw;
   }
+}
 
-  #result{
-    bottom: 14vw;
+@media only screen and (min-aspect-ratio: 0.9){
+  :root{
+    --select-width: 45vw;
+    --map-width: 55vw;
   }
+}
 
-  #restart{
-    width: 50vw;
-    height: 9.5vw;
-    left: 20vw;
+@media only screen and (min-aspect-ratio: 1){
+  :root{
+    --select-width: 40vw;
+    --map-width: 50vw;
+    --robot-width: 15vw;
+    --human-width: 20vw;
   }
+}
 
-  .vertical, .horizontal{
-    height: 8px;
+@media only screen and (min-aspect-ratio: 1.2){
+  :root{
+    --select-width: 35vw;
+    --map-width: 45vw;
   }
+}
 
-  #diagonal1, #diagonal2{
-    height: 45vw;
+@media only screen and (min-aspect-ratio: 1.3){
+  :root{
+    --select-width: 30vw;
+    --map-width: 40vw;
   }
+}
 
-  .vertical, .horizontal, #diagonal1, #diagonal2{
-    width: 45vw;
-    top: 12vw;
-    left: 22.5vw;
+@media only screen and (min-aspect-ratio: 1.6){
+  :root{
+    --robot-width: 25vh;
+    --human-width: 30vh;
+    --margin: 15vh;
   }
+}
 
-  .vertical{
-    top: 33.5vw;
-  }
-
-  #robot{
-    width: 35vw;
-    height: 48vw;
-    left: 10vw;
-  }
-
-  #human{
-    width: 45vw;
-    height: 58vw;
-    right: 10vw;
+@media only screen and (min-aspect-ratio: 1.8){
+  :root{
+    --select-width: 55vh;
+    --map-width: 65vh;
   }
 }
