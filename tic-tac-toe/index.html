@@ -1,48 +1,48 @@
 <!DOCTYPE html>
 <html>
-<head>
-<link rel = "stylesheet" href = "styles.css">
-<link rel = "manifest" href = "manifest.json">
-<link rel = "icon" href = "images/favicon.svg">
-<link rel = "preload" href = "images/circle_black.svg" as = "image">
-<link rel = "preload" href = "images/cross_black.svg" as = "image">
-<meta name = "viewport" content = "width = device-width, initial-scale = 1.0">
-<title>Tic-tac-toe</title>
-</head>
-<body>
-<div id = "selectContainer">
-  <div class = "selectCharacter" style = "background-color: black">
-    <input type = "radio" id = "cross" name = "character" value = "cross" onclick = "changeCharacter(0)" checked disabled>
-    <label for = "cross"><img src = "images/cross_white.svg" width = "20px" height = "20px"></label>
-  </div>
-  <div class = "selectCharacter">
-    <input type = "radio" id = "circle" name = "character" value = "circle" onclick = "changeCharacter(1)">
-    <label for = "circle"><img src = "images/circle_black.svg" width = "20px" height = "20px"></label>
-  </div>
-</div>
-<div id = "map">
-  <button onclick = "gameRound(0, 0)" class = "bottomBorder rightBorder"></button>
-  <button onclick = "gameRound(0, 1)" class = "bottomBorder rightBorder"></button>
-  <button onclick = "gameRound(0, 2)" class = "bottomBorder"></button>
-  <button onclick = "gameRound(1, 0)" class = "bottomBorder rightBorder"></button>
-  <button onclick = "gameRound(1, 1)" class = "bottomBorder rightBorder"></button>
-  <button onclick = "gameRound(1, 2)" class = "bottomBorder"></button>
-  <button onclick = "gameRound(2, 0)" class = "rightBorder"></button>
-  <button onclick = "gameRound(2, 1)" class = "rightBorder"></button>
-  <button onclick = "gameRound(2, 2)"></button>
-  <p id = "result"></p>
-  <button id = "restart" onclick = "restart()">Restart</button>
-  <img class = "vertical" src = "images/line.svg" width = "250px" height = "10px">
-  <img class = "vertical" src = "images/line.svg" width = "250px" height = "10px">
-  <img class = "vertical" src = "images/line.svg" width = "250px" height = "10px">
-  <img class = "horizontal" src = "images/line.svg" width = "250px" height = "10px">
-  <img class = "horizontal" src = "images/line.svg" width = "250px" height = "10px">
-  <img class = "horizontal" src = "images/line.svg" width = "250px" height = "10px">
-  <img id = "diagonal1" src = "images/diagonal.svg" width = "250px" height = "250px">
-  <img id = "diagonal2" src = "images/diagonal.svg" width = "250px" height = "250px">
-</div>
-<img id = "robot" src = "images/robot.png" width = "270px" height = "350px">
-<img id = "human" src = "images/human.png" width = "300px" height = "400px">
-</body>
-<script src = "javascript.js"></script>
+  <head>
+    <link rel = "stylesheet" href = "styles.css">
+    <link rel = "manifest" href = "manifest.json">
+    <link rel = "icon" href = "images/favicon.svg">
+    <link rel = "preload" href = "images/circle_black.svg" as = "image">
+    <link rel = "preload" href = "images/cross_black.svg" as = "image">
+    <meta name = "viewport" content = "width = device-width, initial-scale = 1.0">
+    <title>Tic-tac-toe</title>
+  </head>
+  <body>
+    <div id = "selectContainer">
+      <div class = "selectCharacter" style = "background-color: black">
+        <input type = "radio" id = "cross" name = "character" value = "cross" onclick = "changeCharacter(0)" checked disabled>
+        <label for = "cross"><img src = "images/cross_white.svg" height = "100%"></label>
+      </div>
+      <div class = "selectCharacter">
+        <input type = "radio" id = "circle" name = "character" value = "circle" onclick = "changeCharacter(1)">
+        <label for = "circle"><img src = "images/circle_black.svg" height = "100%"></label>
+      </div>
+    </div>
+    <div id = "map">
+      <button onclick = "gameRound(0, 0)" class = "bottomBorder rightBorder"></button>
+      <button onclick = "gameRound(0, 1)" class = "bottomBorder rightBorder"></button>
+      <button onclick = "gameRound(0, 2)" class = "bottomBorder"></button>
+      <button onclick = "gameRound(1, 0)" class = "bottomBorder rightBorder"></button>
+      <button onclick = "gameRound(1, 1)" class = "bottomBorder rightBorder"></button>
+      <button onclick = "gameRound(1, 2)" class = "bottomBorder"></button>
+      <button onclick = "gameRound(2, 0)" class = "rightBorder"></button>
+      <button onclick = "gameRound(2, 1)" class = "rightBorder"></button>
+      <button onclick = "gameRound(2, 2)"></button>
+      <p id = "result"></p>
+      <button id = "restart" onclick = "restart()">Restart</button>
+      <img class = "vertical" src = "images/line.svg" width = "250px" height = "10px">
+      <img class = "vertical" src = "images/line.svg" width = "250px" height = "10px">
+      <img class = "vertical" src = "images/line.svg" width = "250px" height = "10px">
+      <img class = "horizontal" src = "images/line.svg" width = "250px" height = "10px">
+      <img class = "horizontal" src = "images/line.svg" width = "250px" height = "10px">
+      <img class = "horizontal" src = "images/line.svg" width = "250px" height = "10px">
+      <img id = "diagonal1" src = "images/diagonal.svg" width = "250px" height = "250px">
+      <img id = "diagonal2" src = "images/diagonal.svg" width = "250px" height = "250px">
+    </div>
+    <img id = "robot" src = "images/robot.png" width = "270px" height = "350px">
+    <img id = "human" src = "images/human.png" width = "300px" height = "400px">
+  </body>
+  <script src = "javascript.js"></script>
 </html>
