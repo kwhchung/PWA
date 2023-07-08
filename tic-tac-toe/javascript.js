@@ -10,7 +10,7 @@ if("serviceWorker" in navigator){
   navigator.serviceWorker.register("sw.js").catch(() => console.log("failed"));
 }
 
-// set the verticle and horizontal lines to locate at the center of the grid cells
+// set the vertical and horizontal lines to locate at the center of the grid cells
 // offsetWidth / offsetHeight = content + padding + border
 // clientWidth / clientHeight = content + padding
 // offsetTop = top position in parent element
