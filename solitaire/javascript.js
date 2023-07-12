@@ -1,18 +1,30 @@
+// class of a Card object
 class Card{
+  // initialize a Card object
   constructor(type, num){
+    // type = H (heart), S (spade), D (diamond), C (club)
     this.type = type;
+    // num = 1 - 13 (1 = A, 11 = J, 12 = Q, 13 = K)
     this.num = num;
+    //
     this.display = false;
     this.image = "images/" + type + num + ".png";
   }
 }
 
+// collection of all 52 cards objects
 const cards = [];
+// possible types of the cards
 const types = ["H", "S", "D", "C"];
+// collection of the cards in the deck
 const deck = [];
+// collection of the cards in the 4 final stacks
 const finals = [[], [], [], []];
+// collection of the cards in the 7 stacks
 const stacks = [[], [], [], [], [], [], []];
+// store the cards that are already picked, used for random distribution of the cards at the start of a game
 const picked = [];
+//
 const dragged = [-1, -1];
 const mainRect = document.getElementsByTagName("main")[0].getBoundingClientRect();
 let deckPos = -1;
@@ -26,58 +38,54 @@ let a = 1;
 let endRect = 0;
 let aIncreased = false;
 let mode = 0;
+
+// register sevice worker to enable PWA features
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("sw.js").catch(() => console.log("failed"));
 }
 
+// initialize the Card objects for every combination of types and numbers
 for(let i = 0; i < 4; i ++){
   for(let j = 1; j <= 13; j ++){
     cards.push(new Card(types[i], j));
   }
 }
-start();
 
-function start(){
+//start the game
+const start = () => {
+  // randomly generate cards for the 7 stacks
   for(let i = 0; i < 7; i ++){
+    // the number of cards in each stack increases from 0 to 6
     for(let j = 0; j <= i; j ++){
+      // randomly pick a card in 52 cards
       let n;
       do{
+        // repick a card if it has already been picked
         n = Math.floor(Math.random() * 52);
       }while(picked.includes(n));
       stacks[i].push(cards[n]);
       picked.push(n);
-
       if(j == i){
         stacks[j][j].display = true;
       }
-      let card;
+      let card = document.createElement("img");
       if(stacks[i][j].display){
-        card = document.createElement("img");
         card.src = stacks[i][j].image;
         card.setAttribute("width", "100%");
         card.setAttribute("height", "100%");
         card.style.position = "absolute";
-        if(innerWidth > 768){
-          card.style.top = (27 * j) + "px";
-        }else{
-          card.style.top = (20 * j) + "px";
-        }
+        card.style.top = (8 * j) + "%";
         card.setAttribute("ondragstart", "drag(" + i + ", " + j + ")");
         card.setAttribute("ondragend", "endDrag()");
         card.setAttribute("ontouchmove", "touchDrag(" + i + ", " + j + ")");
         card.setAttribute("ontouchend", "touchDrop()");
         card.setAttribute("ontouchcancel", "touchDrop()");
       }else{
-        card = document.createElement("img");
         card.src = "images/back.png";
         card.setAttribute("width", "100%");
         card.setAttribute("height", "100%");
         card.style.position = "absolute";
-        if(innerWidth > 768){
-          card.style.top = (27 * j) + "px";
-        }else{
-          card.style.top = (20 * j) + "px";
-        }
+        card.style.top = (8 * j) + "%";
         card.setAttribute("draggable", "false");
         card.setAttribute("onclick", "displayCard(" + i + ", " + j + ")");
       }
@@ -85,6 +93,7 @@ function start(){
       document.getElementsByClassName("droppable")[i].style.height = document.getElementsByClassName("place")[0].offsetHeight * 2 + 20 * (stacks[i].length - 1) + "px";
     }
   }
+
   for(let i = 0; i < 24; i ++){
     let n;
     do{
@@ -95,6 +104,8 @@ function start(){
   }
   document.getElementById("deck").getElementsByClassName("place")[0].innerHTML = "<img src = 'images/back.png' width = '100%' height = '100%' draggable = 'false'>";
 }
+
+start();
 
 function displayDeck(){
   if(mode == 0){
@@ -137,7 +148,7 @@ function displayDeck(){
       card.setAttribute("width", "100%");
       card.setAttribute("height", "100%");
       card.style.position = "absolute";
-      card.style.left = 20 * i + "px";
+      card.style.left = 30 * i + "%";
       card.setAttribute("ondragstart", "drag(-1, " + deckPos + ")");
       card.setAttribute("ondragend", "endDrag()");
       card.setAttribute("ontouchend", "touchDrop()");
@@ -295,6 +306,12 @@ function allowDrop(){
 }
 
 function stackDrop(i){
+  let top;
+  if(stacks[i].length > 0){
+    top = parseInt(document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].lastElementChild.style.top);
+  }else{
+    top = -25;
+  }
   let valid = false;
   if(dragged[0] > 6){
     if(stacks[i].length > 0){
@@ -317,11 +334,13 @@ function stackDrop(i){
     if(valid){
       stacks[i].push(finals[dragged[0] - 7][dragged[1]]);
       finals[dragged[0] - 7].pop();
-      if(innerWidth > 768){
+      /*if(innerWidth > 768){
         document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.top = 27 * (stacks[i].length - 1) + "px";
       }else{
         document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.top = 20 * (stacks[i].length - 1) + "px";
-      }
+      }*/
+      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.top = (top + 25) + "%";
+      top += 25;
       document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.opacity = "1";
       document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ondragstart", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
       document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ontouchmove", "touchDrag(" + i + ", " + (stacks[i].length - 1) + ")");
@@ -352,11 +371,13 @@ function stackDrop(i){
       for(let j = dragged[1]; j < n; j ++){
         stacks[i].push(stacks[dragged[0]][dragged[1]]);
         stacks[dragged[0]].splice(dragged[1], 1);
-        if(innerWidth > 768){
+        /*if(innerWidth > 768){
           document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.top = 27 * (stacks[i].length - 1) + "px";
         }else{
           document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.top = 20 * (stacks[i].length - 1) + "px";
-        }
+        }*/
+        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.top = (top + 25) + "%";
+        top += 25;
         document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.opacity = "1";
         document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ondragstart", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
         document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ontouchmove", "touchDrag(" + i + ", " + (stacks[i].length - 1) + ")");
@@ -387,11 +408,13 @@ function stackDrop(i){
       stacks[i].push(deck[dragged[1]]);
       deck.splice(dragged[1], 1);
       deckPos --;
-      if(innerWidth > 768){
+      /*if(innerWidth > 768){
         document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.top = 27 * (stacks[i].length - 1) + "px";
       }else{
         document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.top = 20 * (stacks[i].length - 1) + "px";
-      }
+      }*/
+      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.top = (top + 25) + "%";
+      top += 25;
       document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.left = "0";
       document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.opacity = "1";
       document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ondragstart", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
