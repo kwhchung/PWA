@@ -1,86 +1,139 @@
 <!DOCTYPE html>
 <html>
-<head>
-<link rel = "stylesheet" href = "styles.css">
-<link rel = "manifest" href = "manifest.json">
-<link rel = "icon" href = "images/favicon.png">
-<meta name = "viewport" content = "width = device-width, initial-scale = 1.0, user-scalable = no">
-<title>Solitaire</title>
-</head>
+  <head>
+    <link rel = "stylesheet" href = "styles.css">
+    <link rel = "manifest" href = "manifest.json">
+    <link rel = "icon" href = "images/favicon.png">
+    <link rel = "preload" href = "images/back.png" as = "image">
+    <link rel = "preload" href = "images/C1.png" as = "image">
+    <link rel = "preload" href = "images/C2.png" as = "image">
+    <link rel = "preload" href = "images/C3.png" as = "image">
+    <link rel = "preload" href = "images/C4.png" as = "image">
+    <link rel = "preload" href = "images/C5.png" as = "image">
+    <link rel = "preload" href = "images/C6.png" as = "image">
+    <link rel = "preload" href = "images/C7.png" as = "image">
+    <link rel = "preload" href = "images/C8.png" as = "image">
+    <link rel = "preload" href = "images/C9.png" as = "image">
+    <link rel = "preload" href = "images/C10.png" as = "image">
+    <link rel = "preload" href = "images/C11.png" as = "image">
+    <link rel = "preload" href = "images/C12.png" as = "image">
+    <link rel = "preload" href = "images/C13.png" as = "image">
+    <link rel = "preload" href = "images/D1.png" as = "image">
+    <link rel = "preload" href = "images/D2.png" as = "image">
+    <link rel = "preload" href = "images/D3.png" as = "image">
+    <link rel = "preload" href = "images/D4.png" as = "image">
+    <link rel = "preload" href = "images/D5.png" as = "image">
+    <link rel = "preload" href = "images/D6.png" as = "image">
+    <link rel = "preload" href = "images/D7.png" as = "image">
+    <link rel = "preload" href = "images/D8.png" as = "image">
+    <link rel = "preload" href = "images/D9.png" as = "image">
+    <link rel = "preload" href = "images/D10.png" as = "image">
+    <link rel = "preload" href = "images/D11.png" as = "image">
+    <link rel = "preload" href = "images/D12.png" as = "image">
+    <link rel = "preload" href = "images/D13.png" as = "image">
+    <link rel = "preload" href = "images/H1.png" as = "image">
+    <link rel = "preload" href = "images/H2.png" as = "image">
+    <link rel = "preload" href = "images/H3.png" as = "image">
+    <link rel = "preload" href = "images/H4.png" as = "image">
+    <link rel = "preload" href = "images/H5.png" as = "image">
+    <link rel = "preload" href = "images/H6.png" as = "image">
+    <link rel = "preload" href = "images/H7.png" as = "image">
+    <link rel = "preload" href = "images/H8.png" as = "image">
+    <link rel = "preload" href = "images/H9.png" as = "image">
+    <link rel = "preload" href = "images/H10.png" as = "image">
+    <link rel = "preload" href = "images/H11.png" as = "image">
+    <link rel = "preload" href = "images/H12.png" as = "image">
+    <link rel = "preload" href = "images/H13.png" as = "image">
+    <link rel = "preload" href = "images/S1.png" as = "image">
+    <link rel = "preload" href = "images/S2.png" as = "image">
+    <link rel = "preload" href = "images/S3.png" as = "image">
+    <link rel = "preload" href = "images/S4.png" as = "image">
+    <link rel = "preload" href = "images/S5.png" as = "image">
+    <link rel = "preload" href = "images/S6.png" as = "image">
+    <link rel = "preload" href = "images/S7.png" as = "image">
+    <link rel = "preload" href = "images/S8.png" as = "image">
+    <link rel = "preload" href = "images/S9.png" as = "image">
+    <link rel = "preload" href = "images/S10.png" as = "image">
+    <link rel = "preload" href = "images/S11.png" as = "image">
+    <link rel = "preload" href = "images/S12.png" as = "image">
+    <link rel = "preload" href = "images/S13.png" as = "image">
+    <meta name = "viewport" content = "width = device-width, initial-scale = 1.0, user-scalable = no">
+    <title>Solitaire</title>
+  </head>
 <body ondragover = "allowDrop()" ontouchmove = "allowDrop()">
-<main>
-  <table>
-    <tr>
-      <td id = "deck">
-        <div class = "place" onclick = "displayDeck()"></div>
-      </td>
-      <td id = "display" colspan = "2">
-        <div class = "place"></div>
-      </td>
-      <td class = "final" ondrop = "finalDrop(0)">
-        <div class = "place"></div>
-      </td>
-      <td class = "final" ondrop = "finalDrop(1)">
-        <div class = "place"></div>
-      </td>
-      <td class = "final" ondrop = "finalDrop(2)">
-        <div class = "place"></div>
-      </td>
-      <td class = "final" ondrop = "finalDrop(3)">
-        <div class = "place"></div>
-      </td>
-    </tr>
-    <tr>
-      <td class = "stack">
-        <div class = "droppable" ondrop = "stackDrop(0)">
+  <main>
+    <table>
+      <tr>
+        <td id = "deck">
+          <div class = "place" onclick = "displayDeck()"></div>
+        </td>
+        <td id = "display" colspan = "2">
           <div class = "place"></div>
-        </div>
-      </td>
-      <td class = "stack">
-        <div class = "droppable" ondrop = "stackDrop(1)">
+        </td>
+        <td class = "final" ondrop = "finalDrop(0)">
           <div class = "place"></div>
-        </div>
-      </td>
-      <td class = "stack">
-        <div class = "droppable" ondrop = "stackDrop(2)">
+        </td>
+        <td class = "final" ondrop = "finalDrop(1)">
           <div class = "place"></div>
-        </div>
-      </td>
-      <td class = "stack">
-        <div class = "droppable" ondrop = "stackDrop(3)">
+        </td>
+        <td class = "final" ondrop = "finalDrop(2)">
           <div class = "place"></div>
-        </div>
-      </td>
-      <td class = "stack">
-        <div class = "droppable" ondrop = "stackDrop(4)">
+        </td>
+        <td class = "final" ondrop = "finalDrop(3)">
           <div class = "place"></div>
-        </div>
-      </td>
-      <td class = "stack">
-        <div class = "droppable" ondrop = "stackDrop(5)">
-          <div class = "place"></div>
-        </div>
-      </td>
-      <td class = "stack">
-        <div class = "droppable" ondrop = "stackDrop(6)">
-          <div class = "place"></div>
-        </div>
-      </td>
-    </tr>
-  </table>
-  <div id = "end"></div>
-</main>
-<div id = "selectMode">
-  <label for = "mode">Mode: </label>
-  <select id = "mode">
-    <option value = "1" selected>1 card</option>
-    <option value = "3">3 cards</option>
-  </select>
-  <button id = "restart" onclick = "restart()">Restart</button>
-</div>
-<div id = "ghost">
-  <div id = "ghostPlace"></div>
-</div>
-</body>
+        </td>
+      </tr>
+      <tr>
+        <td class = "stack">
+          <div class = "droppable" ondrop = "stackDrop(0)">
+            <div class = "place"></div>
+          </div>
+        </td>
+        <td class = "stack">
+          <div class = "droppable" ondrop = "stackDrop(1)">
+            <div class = "place"></div>
+          </div>
+        </td>
+        <td class = "stack">
+          <div class = "droppable" ondrop = "stackDrop(2)">
+            <div class = "place"></div>
+          </div>
+        </td>
+        <td class = "stack">
+          <div class = "droppable" ondrop = "stackDrop(3)">
+            <div class = "place"></div>
+          </div>
+        </td>
+        <td class = "stack">
+          <div class = "droppable" ondrop = "stackDrop(4)">
+            <div class = "place"></div>
+          </div>
+        </td>
+        <td class = "stack">
+          <div class = "droppable" ondrop = "stackDrop(5)">
+            <div class = "place"></div>
+          </div>
+        </td>
+        <td class = "stack">
+          <div class = "droppable" ondrop = "stackDrop(6)">
+            <div class = "place"></div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div id = "end"></div>
+  </main>
+  <div id = "selectMode">
+    <label for = "mode">Mode: </label>
+    <select id = "mode">
+      <option value = "1" selected>1 card</option>
+      <option value = "3">3 cards</option>
+    </select>
+    <button id = "restart" onclick = "restart()">Restart</button>
+  </div>
+  <div id = "ghost">
+    <div id = "ghostPlace"></div>
+  </div>
+  </body>
 <script src = "javascript.js"></script>
 </html>
