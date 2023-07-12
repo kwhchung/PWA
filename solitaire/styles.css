@@ -1,13 +1,25 @@
+:root{
+  --main-width: 100vw;
+  --main-top-margin: 0;
+  --horizontal-padding: 1vw;
+  --vertical-padding: 2vh;
+  --card-width: calc((var(--main-width) - var(--horizontal-padding) * 2) / 7 - var(--horizontal-padding) * 2);
+}
+
 *{
   box-sizing: border-box;
 }
 
+body{
+  margin: 0;
+}
+
 main{
-  width: 900px;
-  height: 700px;
-  margin: 20px auto;
+  width: var(--main-width);
+  height: 80vh;
+  margin: var(--main-top-margin) auto 20px;
   background-color: DarkGreen;
-  padding: 15px 30px;
+  padding: var(--vertical-padding) var(--horizontal-padding);
   position: relative;
 }
 
@@ -17,9 +29,13 @@ table{
 }
 
 td{
-  width: 120px;
-  height: 130px;
-  padding: 10px 22.5px;
+  width: calc(var(--card-width) + var(--horizontal-padding) * 2);
+  height: calc(var(--card-width) / 0.7 + var(--vertical-padding) * 2);
+  padding: var(--vertical-padding) var(--horizontal-padding);
+}
+
+#display{
+  padding-right: calc(var(--card-width) + var(--horizontal-padding) * 3);
 }
 
 .stack{
@@ -27,16 +43,19 @@ td{
 }
 
 .droppable{
-  width: 120px;
-  padding: 10px 22.5px;
+  width: calc(var(--card-width) + var(--horizontal-width) * 2);
+  padding: var(--vertical-padding) var(--horizontal-padding);
   position: absolute;
   top: 0;
   left: 0;
 }
 
+.place, #ghost{
+  width: var(--card-width);
+  height: calc(var(--card-width) / 0.7);
+}
+
 .place{
-  width: 75px;
-  height: 110px;
   border: 1px solid grey;
   border-radius: 5px;
   position: relative;
@@ -55,6 +74,11 @@ td{
 #selectMode{
   font-size: 20px;
   text-align: center;
+  /*width: 100%;
+  padding: 20px;
+  background-color: white;
+  position: absolute;
+  bottom: 0;*/
 }
 
 #mode{
@@ -67,8 +91,6 @@ td{
 }
 
 #ghost{
-  width: 75px;
-  height: 110px;
   position: absolute;
   top: 0;
   left: -200px;
@@ -80,31 +102,51 @@ td{
   position: relative;
 }
 
-@media only screen and (max-width: 768px){
-  body{
-    margin: 0;
+@media only screen and (min-aspect-ratio: 0.8){
+  :root{
+    --horizontal-padding: 2vw;
+    --vertical-padding: 1.5vh;
   }
+}
 
-  main{
-    width: 100vw;
-    height: 80vh;
-    margin-top: 0;
-    padding: 3px;
+@media only screen and (min-aspect-ratio: 0.95){
+  :root{
+    --horizontal-padding: 2.5vw;
+    --vertical-padding: 1vh;
   }
+}
 
-  td{
-    width: calc((100vw - 6px) / 7);
-    height: calc((100vw - 6px) / 5 + 24px);
-    padding: 15px 3px;
+@media only screen and (min-aspect-ratio: 1.15){
+  :root{
+    --horizontal-padding: 3vw;
   }
+}
 
-  .droppable{
-    width: calc((100vw - 6px) / 7);
-    padding: 15px 3px;
+@media only screen and (min-aspect-ratio: 1.3){
+  :root{
+    --main-width: 80vw;
+    --main-top-margin: 20px;
+    --horizontal-padding: 2vw;
   }
+}
 
-  .place, #ghost{
-    width: calc((100vw - 6px) / 7 - 6px);
-    height: calc((100vw - 6px) / 5 - 6px);
+@media only screen and (min-aspect-ratio: 1.45){
+  :root{
+    --main-width: 70vw;
+    --horizontal-padding: 2vw;
+  }
+}
+
+@media only screen and (min-aspect-ratio: 1.8){
+  :root{
+    --main-width: 60vw;
+    --horizontal-padding: 1.5vw;
+  }
+}
+
+@media only screen and (min-aspect-ratio: 2){
+  :root{
+    --main-width: 50vw;
+    --horizontal-padding: 1vw;
   }
 }
