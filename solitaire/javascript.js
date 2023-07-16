@@ -27,11 +27,11 @@ const picked = [];
 //
 const dragged = [-1, -1];
 const ghostPos = [-1, -1];
+let dragPos = [-1, -1];
 let emptyImage = new Image();
 const mainRect = document.getElementsByTagName("main")[0].getBoundingClientRect();
 let deckPos = -1;
 let dropped = true;
-let dragPos = -1;
 let endPos = 0;
 let endInterval = 0;
 let x = 0;
@@ -216,16 +216,23 @@ function removeDragImage(){
 
 function drag(i, j){
   let top = -22;
+  if(event.type == "drag"){
+    dragPos[0] = event.pageX;
+    dragPos[1] = event.pageY;
+  }else{
+    dragPos[0] = event.changedTouches[0].pageX;
+    dragPos[1] = event.changedTouches[0].pageY;
+  }
   if(dropped){
     dropped = false;
     dragged[0] = i;
     dragged[1] = j;
     if(event.type == "drag"){
-      ghostPos[0] = event.offsetY;
-      ghostPos[1] = event.offsetX;
+      ghostPos[0] = event.offsetX;
+      ghostPos[1] = event.offsetY;
     }else{
-      ghostPos[0] = event.changedTouches[0].pageY - event.srcElement.getBoundingClientRect().y;
-      ghostPos[1] = event.changedTouches[0].pageX - event.srcElement.getBoundingClientRect().x;
+      ghostPos[0] = event.changedTouches[0].pageX - event.srcElement.getBoundingClientRect().x;
+      ghostPos[1] = event.changedTouches[0].pageY - event.srcElement.getBoundingClientRect().y;
     }
     if(i > 6){
       let card = document.createElement("img");
@@ -256,22 +263,17 @@ function drag(i, j){
     }
   }
   if(event.type == "drag"){
-    document.getElementById("ghost").style.top = (event.pageY - ghostPos[0]) + "px";
-    document.getElementById("ghost").style.left = (event.pageX - ghostPos[1]) + "px";
+    document.getElementById("ghost").style.top = (event.pageY - ghostPos[1]) + "px";
+    document.getElementById("ghost").style.left = (event.pageX - ghostPos[0]) + "px";
   }else{
-    document.getElementById("ghost").style.top = (event.changedTouches[0].pageY - ghostPos[0]) + "px";
-    document.getElementById("ghost").style.left = (event.changedTouches[0].pageX - ghostPos[1]) + "px";
+    document.getElementById("ghost").style.top = (event.changedTouches[0].pageY - ghostPos[1]) + "px";
+    document.getElementById("ghost").style.left = (event.changedTouches[0].pageX - ghostPos[0]) + "px";
   }
 }
 
 function drop(){
   if(!dropped){
-    let n;
-    if(event.type == "dragend"){
-      n = document.elementsFromPoint(event.pageX, event.pageY);
-    }else{
-      n = document.elementsFromPoint(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
-    }
+    let n = document.elementsFromPoint(dragPos[0], dragPos[1]);
     for(let i = 0; i < n.length; i ++){
       if(n[i].hasAttribute("ondrop")){
         eval(n[i].getAttribute("ondrop"));
