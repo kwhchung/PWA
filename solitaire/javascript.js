@@ -26,6 +26,8 @@ const stacks = [[], [], [], [], [], [], []];
 const picked = [];
 //
 const dragged = [-1, -1];
+const ghostPos = [-1, -1];
+let emptyImage = new Image();
 const mainRect = document.getElementsByTagName("main")[0].getBoundingClientRect();
 let deckPos = -1;
 let dropped = true;
@@ -43,6 +45,8 @@ let mode = 0;
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("sw.js").catch(() => console.log("failed"));
 }
+
+emptyImage.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 // initialize the Card objects for every combination of types and numbers
 for(let i = 0; i < 4; i ++){
@@ -75,11 +79,15 @@ const start = () => {
         card.setAttribute("height", "100%");
         card.style.position = "absolute";
         card.style.top = (8 * j) + "%";
-        card.setAttribute("ondragstart", "drag(" + i + ", " + j + ")");
-        card.setAttribute("ondragend", "endDrag()");
-        card.setAttribute("ontouchmove", "touchDrag(" + i + ", " + j + ")");
-        card.setAttribute("ontouchend", "touchDrop()");
-        card.setAttribute("ontouchcancel", "touchDrop()");
+        // draggble must be set to true to set the drag image to an empty image
+        card.setAttribute("draggable", "true");
+        // drag image can only be set in dragstart event
+        card.setAttribute("ondragstart", "removeDragImage()");
+        card.setAttribute("ondrag", "drag(" + i + ", " + j + ")");
+        card.setAttribute("ondragend", "drop()");
+        card.setAttribute("ontouchmove", "drag(" + i + ", " + j + ")");
+        card.setAttribute("ontouchend", "drop()");
+        card.setAttribute("ontouchcancel", "drop()");
       }else{
         card.src = "images/back.png";
         card.setAttribute("width", "100%");
@@ -120,11 +128,15 @@ function displayDeck(){
       card.setAttribute("width", "100%");
       card.setAttribute("height", "100%");
       card.style.position = "absolute";
-      card.setAttribute("ondragstart", "drag(-1, " + deckPos + ")");
-      card.setAttribute("ondragend", "endDrag()");
-      card.setAttribute("ontouchmove", "touchDrag(-1, " + deckPos + ")");
-      card.setAttribute("ontouchend", "touchDrop()");
-      card.setAttribute("ontouchcancel", "touchDrop()");
+      // draggble must be set to true to set the drag image to an empty image
+      card.setAttribute("draggable", "true");
+      // drag image can only be set in dragstart event
+      card.setAttribute("ondragstart", "removeDragImage()");
+      card.setAttribute("ondrag", "drag(-1, " + deckPos + ")");
+      card.setAttribute("ondragend", "drop()");
+      card.setAttribute("ontouchmove", "drag(-1, " + deckPos + ")");
+      card.setAttribute("ontouchend", "drop()");
+      card.setAttribute("ontouchcancel", "drop()");
       document.getElementById("display").getElementsByClassName("place")[0].appendChild(card);
     }
     if(deckPos == deck.length - 1){
@@ -149,12 +161,16 @@ function displayDeck(){
       card.setAttribute("height", "100%");
       card.style.position = "absolute";
       card.style.left = 30 * i + "%";
-      card.setAttribute("ondragstart", "drag(-1, " + deckPos + ")");
-      card.setAttribute("ondragend", "endDrag()");
-      card.setAttribute("ontouchend", "touchDrop()");
-      card.setAttribute("ontouchcancel", "touchDrop()");
+      // draggble must be set to true to set the drag image to an empty image
+      card.setAttribute("draggable", "true");
+      // drag image can only be set in dragstart event
+      card.setAttribute("ondragstart", "removeDragImage()");
+      card.setAttribute("ondrag", "drag(-1, " + deckPos + ")");
+      card.setAttribute("ondragend", "drop()");
+      card.setAttribute("ontouchend", "drop()");
+      card.setAttribute("ontouchcancel", "drop()");
       if(i == 2 || deckPos == deck.length - 1){
-        card.setAttribute("ontouchmove", "touchDrag(-1, " + deckPos + ")");
+        card.setAttribute("ontouchmove", "drag(-1, " + deckPos + ")");
       }else{
         card.setAttribute("draggable", "false");
       }
@@ -181,20 +197,36 @@ function displayCard(i, j){
   if(j == stacks[i].length - 1){
     document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].src = stacks[i][j].image;
     document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].draggable = "true";
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ondragstart", "drag(" + i + ", " + j + ")");
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ondragend", "endDrag()");
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ontouchmove", "touchDrag(" + i + ", " + j + ")");
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ontouchend", "touchDrop()");
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ontouchcancel", "touchDrop()");
+    // draggble must be set to true to set the drag image to an empty image
+    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("draggable", "true");
+    // drag image can only be set in dragstart event
+    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ondragstart", "removeDragImage()");
+    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ondrag", "drag(" + i + ", " + j + ")");
+    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ondragend", "drop()");
+    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ontouchmove", "drag(" + i + ", " + j + ")");
+    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ontouchend", "drop()");
+    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ontouchcancel", "drop()");
     document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].removeAttribute("onclick");
   }
 }
 
+function removeDragImage(){
+  event.dataTransfer.setDragImage(emptyImage, 0, 0);
+}
+
 function drag(i, j){
+  let top = -22;
   if(dropped){
     dropped = false;
     dragged[0] = i;
     dragged[1] = j;
+    if(event.type == "drag"){
+      ghostPos[0] = event.offsetY;
+      ghostPos[1] = event.offsetX;
+    }else{
+      ghostPos[0] = event.changedTouches[0].pageY - event.srcElement.getBoundingClientRect().y;
+      ghostPos[1] = event.changedTouches[0].pageX - event.srcElement.getBoundingClientRect().x;
+    }
     if(i > 6){
       let card = document.createElement("img");
       card.src = finals[i - 7][j].image;
@@ -209,11 +241,8 @@ function drag(i, j){
         card.setAttribute("width", "100%");
         card.setAttribute("height", "100%");
         card.style.position = "absolute";
-        if(innerWidth > 768){
-          card.style.top = (k - j) * 27 + "px";
-        }else{
-          card.style.top = (k - j) * 20 + "px";
-        }
+        card.style.top = (top + 22) + "%";
+        top += 22;
         document.getElementById("ghostPlace").appendChild(card);
         document.getElementsByClassName("stack")[i].getElementsByTagName("img")[k].style.opacity = "0";
       }
@@ -225,11 +254,30 @@ function drag(i, j){
       document.getElementById("ghostPlace").appendChild(card);
       document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.opacity = "0";
     }
-    event.dataTransfer.setDragImage(document.getElementById("ghost"), document.getElementById("ghost").offsetHeight / 2, document.getElementById("ghost").offsetWidth / 2);
+  }
+  if(event.type == "drag"){
+    document.getElementById("ghost").style.top = (event.pageY - ghostPos[0]) + "px";
+    document.getElementById("ghost").style.left = (event.pageX - ghostPos[1]) + "px";
+  }else{
+    document.getElementById("ghost").style.top = (event.changedTouches[0].pageY - ghostPos[0]) + "px";
+    document.getElementById("ghost").style.left = (event.changedTouches[0].pageX - ghostPos[1]) + "px";
   }
 }
 
-function endDrag(){
+function drop(){
+  if(!dropped){
+    let n;
+    if(event.type == "dragend"){
+      n = document.elementsFromPoint(event.pageX, event.pageY);
+    }else{
+      n = document.elementsFromPoint(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
+    }
+    for(let i = 0; i < n.length; i ++){
+      if(n[i].hasAttribute("ondrop")){
+        eval(n[i].getAttribute("ondrop"));
+      }
+    }
+  }
   document.getElementById("ghostPlace").innerHTML = "";
   document.getElementById("ghost").style.left = "-200px";
   if(!dropped){
@@ -249,70 +297,18 @@ function endDrag(){
   }
 }
 
-function touchDrag(i, j){
-  if(dropped){
-    dropped = false;
-    dragged[0] = i;
-    dragged[1] = j;
-    if(i > 6){
-      let card = document.createElement("img");
-      card.src = finals[i - 7][j].image;
-      card.setAttribute("width", "100%");
-      card.setAttribute("height", "100%");
-      document.getElementById("ghostPlace").appendChild(card);
-      document.getElementsByClassName("final")[i - 7].getElementsByTagName("img")[j].style.opacity = "0";
-    }else if(i > -1){
-      for(let k = j; k < stacks[i].length; k ++){
-        let card = document.createElement("img");
-        card.src = stacks[i][k].image;
-        card.setAttribute("width", "100%");
-        card.setAttribute("height", "100%");
-        card.style.position = "absolute";
-        if(innerWidth > 768){
-          card.style.top = (k - j) * 27 + "px";
-        }else{
-          card.style.top = (k - j) * 20 + "px";
-        }
-        document.getElementById("ghostPlace").appendChild(card);
-        document.getElementsByClassName("stack")[i].getElementsByTagName("img")[k].style.opacity = "0";
-      }
-    }else{
-      let card = document.createElement("img");
-      card.src = deck[j].image;
-      card.setAttribute("width", "100%");
-      card.setAttribute("height", "100%");
-      document.getElementById("ghostPlace").appendChild(card);
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.opacity = "0";
-    }
-  }
-  document.getElementById("ghost").style.top = (event.changedTouches[0].pageY - document.getElementById("ghost").offsetHeight / 2) + "px";
-  document.getElementById("ghost").style.left = (event.changedTouches[0].pageX - document.getElementById("ghost").offsetWidth / 2) + "px";
-}
-
-function touchDrop(){
-  if(!dropped){
-    let n = document.elementsFromPoint(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
-    for(let i = 0; i < n.length; i ++){
-      if(n[i].hasAttribute("ondrop")){
-        eval(n[i].getAttribute("ondrop"));
-      }
-    }
-  }
-  endDrag();
-}
-
 function allowDrop(){
   event.preventDefault();
 }
 
 function stackDrop(i){
+  let valid = false;
   let top;
   if(stacks[i].length > 0){
     top = parseInt(document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].lastElementChild.style.top);
   }else{
-    top = -25;
+    top = -22;
   }
-  let valid = false;
   if(dragged[0] > 6){
     if(stacks[i].length > 0){
       if(finals[dragged[0] - 7][dragged[1]].num == stacks[i][stacks[i].length - 1].num - 1){
@@ -334,16 +330,15 @@ function stackDrop(i){
     if(valid){
       stacks[i].push(finals[dragged[0] - 7][dragged[1]]);
       finals[dragged[0] - 7].pop();
-      /*if(innerWidth > 768){
-        document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.top = 27 * (stacks[i].length - 1) + "px";
-      }else{
-        document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.top = 20 * (stacks[i].length - 1) + "px";
-      }*/
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.top = (top + 25) + "%";
-      top += 25;
+      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.top = (top + 22) + "%";
+      top += 22;
       document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.opacity = "1";
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ondragstart", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ontouchmove", "touchDrag(" + i + ", " + (stacks[i].length - 1) + ")");
+      // draggble must be set to true to set the drag image to an empty image
+      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("draggable", "true");
+      // drag image can only be set in dragstart event
+      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ondragstart", "removeDragImage()");
+      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ondrag", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
+      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ontouchmove", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
       document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].appendChild(document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]]);
       document.getElementsByClassName("droppable")[i].style.height = document.getElementsByClassName("place")[0].offsetHeight * 2 + 20 * (stacks[i].length - 1) + "px";
       dropped = true;
@@ -367,20 +362,19 @@ function stackDrop(i){
       }
     }
     if(valid){
-      let n = stacks[dragged[0]].length
+      let n = stacks[dragged[0]].length;
       for(let j = dragged[1]; j < n; j ++){
         stacks[i].push(stacks[dragged[0]][dragged[1]]);
         stacks[dragged[0]].splice(dragged[1], 1);
-        /*if(innerWidth > 768){
-          document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.top = 27 * (stacks[i].length - 1) + "px";
-        }else{
-          document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.top = 20 * (stacks[i].length - 1) + "px";
-        }*/
-        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.top = (top + 25) + "%";
-        top += 25;
+        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.top = (top + 22) + "%";
+        top += 22;
         document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.opacity = "1";
-        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ondragstart", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
-        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ontouchmove", "touchDrag(" + i + ", " + (stacks[i].length - 1) + ")");
+        // draggble must be set to true to set the drag image to an empty image
+        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("draggable", "true");
+        // drag image can only be set in dragstart event
+        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ondragstart", "removeDragImage()");
+        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ondrag", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
+        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ontouchmove", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
         document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].appendChild(document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]]);
         document.getElementsByClassName("droppable")[i].style.height = document.getElementsByClassName("place")[0].offsetHeight * 2 + 20 * (stacks[i].length - 1) + "px";
       }
@@ -408,20 +402,19 @@ function stackDrop(i){
       stacks[i].push(deck[dragged[1]]);
       deck.splice(dragged[1], 1);
       deckPos --;
-      /*if(innerWidth > 768){
-        document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.top = 27 * (stacks[i].length - 1) + "px";
-      }else{
-        document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.top = 20 * (stacks[i].length - 1) + "px";
-      }*/
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.top = (top + 25) + "%";
-      top += 25;
+      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.top = (top + 22) + "%";
+      top += 22;
       document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.left = "0";
       document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.opacity = "1";
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ondragstart", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ontouchmove", "touchDrag(" + i + ", " + (stacks[i].length - 1) + ")");
+      // draggble must be set to true to set the drag image to an empty image
+      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("draggable", "true");
+      // drag image can only be set in dragstart event
+      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ondragstart", "removeDragImage()");
+      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ondrag", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
+      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ontouchmove", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
       document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].appendChild(document.getElementById("display").getElementsByClassName("place")[0].lastElementChild);
       if(document.getElementById("display").getElementsByClassName("place")[0].children.length > 0){
-        document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ontouchmove", "touchDrag(-1, " + (dragged[1] - 1) + ")");
+        document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ontouchmove", "drag(-1, " + (dragged[1] - 1) + ")");
         document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.draggable = "true";
       }
       document.getElementsByClassName("droppable")[i].style.height = document.getElementsByClassName("place")[0].offsetHeight * 2 + 20 * (stacks[i].length - 1) + "px";
@@ -448,8 +441,12 @@ function finalDrop(i){
       deckPos --;
       document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.top = "0";
       document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.opacity = "1";
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ondragstart", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ontouchmove", "touchDrag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
+      // draggble must be set to true to set the drag image to an empty image
+      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("draggable", "true");
+      // drag image can only be set in dragstart event
+      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ondragstart", "removeDragImage()");
+      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ondrag", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
+      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ontouchmove", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
       document.getElementsByClassName("final")[i].getElementsByClassName("place")[0].appendChild(document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]]);
       dropped = true;
     }
@@ -470,8 +467,12 @@ function finalDrop(i){
       stacks[dragged[0]].pop();
       document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.top = "0";
       document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.opacity = "1";
-      document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ondragstart", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
-      document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ontouchmove", "touchDrag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
+      // draggble must be set to true to set the drag image to an empty image
+      document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("draggable", "true");
+      // drag image can only be set in dragstart event
+      document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ondragstart", "removeDragImage()");
+      document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ondrag", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
+      document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ontouchmove", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
       document.getElementsByClassName("final")[i].getElementsByClassName("place")[0].appendChild(document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]]);
       dropped = true;
     }
@@ -492,11 +493,15 @@ function finalDrop(i){
       document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.top = "0";
       document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.left = "0";
       document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.opacity = "1";
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ondragstart", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ontouchmove", "touchDrag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
+      // draggble must be set to true to set the drag image to an empty image
+      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("draggable", "true");
+      // drag image can only be set in dragstart event
+      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ondragstart", "removeDragImage()");
+      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ondrag", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
+      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ontouchmove", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
       document.getElementsByClassName("final")[i].getElementsByClassName("place")[0].appendChild(document.getElementById("display").getElementsByClassName("place")[0].lastElementChild);
       if(document.getElementById("display").getElementsByClassName("place")[0].children.length > 0){
-        document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ontouchmove", "touchDrag(-1, " + (dragged[1] - 1) + ")");
+        document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ontouchmove", "drag(-1, " + (dragged[1] - 1) + ")");
         document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.draggable = "true";
       }
       dropped = true;
