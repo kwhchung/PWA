@@ -43,22 +43,34 @@ input{
   position: relative;
 }
 
-div button{
-  width: calc((100% / 3) - (calc(var(--map-width) / 100) * 2 / 3));
-  height: calc((100% / 3) - (calc(var(--map-width) / 100) * 2 / 3));
-  border: 0;
-  padding: calc(var(--map-width) / 50);
-  background-color: transparent;
+table{
+  width: 100%;
+  height: 100%;
+  border-collapse: collapse;
+}
+
+td{
+  width: calc(var(--map-width) / 6 - var(--map-width) / 100 * 2 / 3);
+  height: calc(var(--map-width) / 6 - var(--map-width) / 100 * 2 / 3);
+  padding: 0;
 }
 
 .bottomBorder{
-  height: calc((100% / 3) + (calc(var(--map-width) / 100) / 3));
+  height: calc(var(--map-width) / 6 + var(--map-width) / 100 / 3);
   border-bottom: calc(var(--map-width) / 100) solid black;
 }
 
 .rightBorder{
-  width: calc((100% / 3) + (calc(var(--map-width) / 100) / 3));
+  width: calc(var(--map-width) / 6 + var(--map-width) / 100 / 3);
   border-right: calc(var(--map-width) / 100) solid black;
+}
+
+td button, #restart{
+  width: calc(var(--map-width) / 6 - var(--map-width) / 100 * 2 / 3);
+  height: calc(var(--map-width) / 6 - var(--map-width) / 100 * 2 / 3);
+  border: 0;
+  padding: calc(var(--map-width) / 50);
+  background-color: transparent;
 }
 
 #result{
@@ -84,6 +96,8 @@ div button{
 
 .vertical, .horizontal{
   height: calc(var(--map-width) / 50);
+  background-color: black;
+  border-radius: calc(var(--map-width) / 100);
 }
 
 #diagonal1, #diagonal2{
@@ -100,11 +114,14 @@ div button{
 }
 
 .vertical{
-  top: calc(var(--map-width) * 0.13 + var(--map-width) / 4);
+  top: calc(var(--map-width) * 0.127 + var(--map-width) / 4);
 }
 
 #diagonal1, #diagonal2{
-  top: calc(var(--map-width) * 0.13);
+  top: calc(var(--map-width) * 0.135);
+  background-image: url("images/diagonal.svg");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   display: none;
 }
 
