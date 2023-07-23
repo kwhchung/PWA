@@ -21,28 +21,54 @@
       </div>
     </div>
     <div id = "map">
-      <button onclick = "gameRound(0, 0)" class = "bottomBorder rightBorder"></button>
-      <button onclick = "gameRound(0, 1)" class = "bottomBorder rightBorder"></button>
-      <button onclick = "gameRound(0, 2)" class = "bottomBorder"></button>
-      <button onclick = "gameRound(1, 0)" class = "bottomBorder rightBorder"></button>
-      <button onclick = "gameRound(1, 1)" class = "bottomBorder rightBorder"></button>
-      <button onclick = "gameRound(1, 2)" class = "bottomBorder"></button>
-      <button onclick = "gameRound(2, 0)" class = "rightBorder"></button>
-      <button onclick = "gameRound(2, 1)" class = "rightBorder"></button>
-      <button onclick = "gameRound(2, 2)"></button>
+      <table>
+        <tr>
+          <td class = "bottomBorder rightBorder">
+            <button onclick = "gameRound(0, 0)"></button>
+          </td>
+          <td class = "bottomBorder rightBorder">
+            <button onclick = "gameRound(0, 1)"></button>
+          </td>
+          <td class = "bottomBorder">
+            <button onclick = "gameRound(0, 2)"></button>
+          </td>
+        </tr>
+        <tr>
+          <td class = "bottomBorder rightBorder">
+            <button onclick = "gameRound(1, 0)"></button>
+          </td>
+          <td class = "bottomBorder rightBorder">
+            <button onclick = "gameRound(1, 1)"></button>
+          </td>
+          <td class = "bottomBorder">
+            <button onclick = "gameRound(1, 2)"></button>
+          </td>
+        </tr>
+        <tr>
+          <td class = "rightBorder">
+            <button onclick = "gameRound(2, 0)"></button>
+          </td>
+          <td class = "rightBorder">
+            <button onclick = "gameRound(2, 1)"></button>
+          </td>
+          <td>
+            <button onclick = "gameRound(2, 2)"></button>
+          </td>
+        </tr>
+      </table>
       <p id = "result"></p>
       <button id = "restart" onclick = "restart()">Restart</button>
-      <img class = "vertical" src = "images/line.svg" width = "250px" height = "10px">
-      <img class = "vertical" src = "images/line.svg" width = "250px" height = "10px">
-      <img class = "vertical" src = "images/line.svg" width = "250px" height = "10px">
-      <img class = "horizontal" src = "images/line.svg" width = "250px" height = "10px">
-      <img class = "horizontal" src = "images/line.svg" width = "250px" height = "10px">
-      <img class = "horizontal" src = "images/line.svg" width = "250px" height = "10px">
-      <img id = "diagonal1" src = "images/diagonal.svg" width = "250px" height = "250px">
-      <img id = "diagonal2" src = "images/diagonal.svg" width = "250px" height = "250px">
+      <div class = "vertical"></div>
+      <div class = "vertical"></div>
+      <div class = "vertical"></div>
+      <div class = "horizontal"></div>
+      <div class = "horizontal"></div>
+      <div class = "horizontal"></div>
+      <div id = "diagonal1"></div>
+      <div id = "diagonal2"></div>
     </div>
-    <img id = "robot" src = "images/robot.png" width = "270px" height = "350px">
-    <img id = "human" src = "images/human.png" width = "300px" height = "400px">
+    <img id = "robot" src = "images/robot.png">
+    <img id = "human" src = "images/human.png">
   </body>
   <script src = "javascript.js"></script>
 </html>
