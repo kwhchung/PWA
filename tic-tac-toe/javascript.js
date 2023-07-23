@@ -13,16 +13,18 @@ if("serviceWorker" in navigator){
 // set the vertical and horizontal lines to locate at the center of the grid cells
 // offsetWidth / offsetHeight = content + padding + border
 // clientWidth / clientHeight = content + padding
-// offsetTop = top position in parent element
+// getBoundClientRect().top = top position of element in viewport
 let verticals = document.getElementsByClassName("vertical");
 let horizontals = document.getElementsByClassName("horizontal");
-let buttons = document.getElementById("map").getElementsByTagName("button");
+let buttons = document.getElementsByTagName("td");
 let buttonWidth = buttons[0].offsetWidth;
 let buttonHeight = buttons[0].offsetHeight;
+let buttonTop = buttons[0].getBoundingClientRect().top - document.getElementById("map").getBoundingClientRect().top;
+let lineHeight = verticals[0].offsetHeight;
 for(let i = 0; i < 3; i ++){
   // calculate the left position of vertical lines different to horizontal lines as they are rotated by the center point, the position before rotation should be calculated
-  verticals[i].style.left = (i * buttonWidth + buttons[i].clientWidth / 2) + "px";
-  horizontals[i].style.top = (i * buttonHeight + buttons[i * 3].clientHeight / 2 + buttons[0].offsetTop - horizontals[i].offsetHeight / 2) + "px";
+  verticals[i].style.left = ((i + 0.5) * buttonWidth) + "px";
+  horizontals[i].style.top = (buttonTop + (i + 0.5) * buttonHeight - lineHeight * 3 / 4) + "px";
   // hide the vertical and horizontal lines, display them after one of the player wins
   verticals[i].style.display = "none";
   horizontals[i].style.display = "none";
