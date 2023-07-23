@@ -212,27 +212,23 @@ function displayCard(i, j){
 
 function removeDragImage(){
   event.dataTransfer.setDragImage(emptyImage, 0, 0);
+  dragPos[0] = event.pageX;
+  dragPos[1] = event.pageY;
+  ghostPos[0] = event.layerX;
+  ghostPos[1] = event.layerY;
 }
 
 function drag(i, j){
   let top = -22;
-  if(event.type == "drag"){
-    dragPos[0] = event.pageX;
-    dragPos[1] = event.pageY;
-  }else{
-    dragPos[0] = event.changedTouches[0].pageX;
-    dragPos[1] = event.changedTouches[0].pageY;
-  }
   if(dropped){
     dropped = false;
     dragged[0] = i;
     dragged[1] = j;
-    if(event.type == "drag"){
-      ghostPos[0] = event.offsetX;
-      ghostPos[1] = event.offsetY;
-    }else{
-      ghostPos[0] = event.changedTouches[0].pageX - event.srcElement.getBoundingClientRect().x;
-      ghostPos[1] = event.changedTouches[0].pageY - event.srcElement.getBoundingClientRect().y;
+    if(event.type == "touchmove"){
+      dragPos[0] = event.changedTouches[0].pageX;
+      dragPos[1] = event.changedTouches[0].pageY;
+      ghostPos[0] = dragPos[0] - event.srcElement.getBoundingClientRect().x;
+      ghostPos[1] = dragPos[1] - event.srcElement.getBoundingClientRect().y;
     }
     if(i > 6){
       let card = document.createElement("img");
@@ -263,11 +259,11 @@ function drag(i, j){
     }
   }
   if(event.type == "drag"){
-    document.getElementById("ghost").style.top = (event.pageY - ghostPos[1]) + "px";
-    document.getElementById("ghost").style.left = (event.pageX - ghostPos[0]) + "px";
+    document.getElementById("ghost").style.top = (dragPos[1] - ghostPos[1]) + "px";
+    document.getElementById("ghost").style.left = (dragPos[0] - ghostPos[0]) + "px";
   }else{
-    document.getElementById("ghost").style.top = (event.changedTouches[0].pageY - ghostPos[1]) + "px";
-    document.getElementById("ghost").style.left = (event.changedTouches[0].pageX - ghostPos[0]) + "px";
+    document.getElementById("ghost").style.top = (dragPos[1] - ghostPos[1]) + "px";
+    document.getElementById("ghost").style.left = (dragPos[0] - ghostPos[0]) + "px";
   }
 }
 
@@ -301,6 +297,13 @@ function drop(){
 
 function allowDrop(){
   event.preventDefault();
+  if(event.type == "dragover"){
+    dragPos[0] = event.pageX;
+    dragPos[1] = event.pageY;
+  }else{
+    dragPos[0] = event.changedTouches[0].pageX;
+    dragPos[1] = event.changedTouches[0].pageY;
+  }
 }
 
 function stackDrop(i){
