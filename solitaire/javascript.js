@@ -24,14 +24,21 @@ const finals = [[], [], [], []];
 const stacks = [[], [], [], [], [], [], []];
 // store the cards that are already picked, used for random distribution of the cards at the start of a game
 const picked = [];
-//
+// [i, j] = position of the dragged card, i = index of stack, j = index of card in that stack
 const dragged = [-1, -1];
+// [x, y] = position of dragged point in the card
 const ghostPos = [-1, -1];
-let dragPos = [-1, -1];
-let emptyImage = new Image();
+// [x, y] = position of dragged point in the page
+const dragPos = [-1, -1];
+// empty Image object for invisibility of the drag image
+const emptyImage = new Image();
+//
 const mainRect = document.getElementsByTagName("main")[0].getBoundingClientRect();
+// index of the displayed card in the deck
 let deckPos = -1;
+// record whether the dragging card is dropped
 let dropped = true;
+//
 let endPos = 0;
 let endInterval = 0;
 let x = 0;
@@ -46,6 +53,7 @@ if("serviceWorker" in navigator){
   navigator.serviceWorker.register("sw.js").catch(() => console.log("failed"));
 }
 
+// link the empty Image object with a transparent image
 emptyImage.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 // initialize the Card objects for every combination of types and numbers
@@ -67,34 +75,38 @@ const start = () => {
         // repick a card if it has already been picked
         n = Math.floor(Math.random() * 52);
       }while(picked.includes(n));
+      // put the card in the stack
       stacks[i].push(cards[n]);
+      // record the picked card
       picked.push(n);
+      // display the last card in the stack
       if(j == i){
         stacks[j][j].display = true;
       }
+      // create the image of the card
       let card = document.createElement("img");
+      card.setAttribute("width", "100%");
+      card.setAttribute("height", "100%");
+      card.style.position = "absolute";
+      card.style.top = (8 * j) + "%";
       if(stacks[i][j].display){
+        // display the image of the card
         card.src = stacks[i][j].image;
-        card.setAttribute("width", "100%");
-        card.setAttribute("height", "100%");
-        card.style.position = "absolute";
-        card.style.top = (8 * j) + "%";
         // draggble must be set to true to set the drag image to an empty image
         card.setAttribute("draggable", "true");
         // drag image can only be set in dragstart event
-        card.setAttribute("ondragstart", "removeDragImage()");
-        card.setAttribute("ondrag", "drag(" + i + ", " + j + ")");
+        card.setAttribute("ondragstart", "drag(" + i + ", " + j + ")");
+        card.setAttribute("ondrag", "console.log(event)");
         card.setAttribute("ondragend", "drop()");
         card.setAttribute("ontouchmove", "drag(" + i + ", " + j + ")");
         card.setAttribute("ontouchend", "drop()");
         card.setAttribute("ontouchcancel", "drop()");
       }else{
+        // display the image of the back of the card
         card.src = "images/back.png";
-        card.setAttribute("width", "100%");
-        card.setAttribute("height", "100%");
-        card.style.position = "absolute";
-        card.style.top = (8 * j) + "%";
+        // disable dragging of undisplayed card
         card.setAttribute("draggable", "false");
+        // click to display the card
         card.setAttribute("onclick", "displayCard(" + i + ", " + j + ")");
       }
       document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].appendChild(card);
@@ -131,8 +143,8 @@ function displayDeck(){
       // draggble must be set to true to set the drag image to an empty image
       card.setAttribute("draggable", "true");
       // drag image can only be set in dragstart event
-      card.setAttribute("ondragstart", "removeDragImage()");
-      card.setAttribute("ondrag", "drag(-1, " + deckPos + ")");
+      card.setAttribute("ondragstart", "drag(-1, " + deckPos + ")");
+      card.setAttribute("ondrag", "console.log(event)");
       card.setAttribute("ondragend", "drop()");
       card.setAttribute("ontouchmove", "drag(-1, " + deckPos + ")");
       card.setAttribute("ontouchend", "drop()");
@@ -164,8 +176,8 @@ function displayDeck(){
       // draggble must be set to true to set the drag image to an empty image
       card.setAttribute("draggable", "true");
       // drag image can only be set in dragstart event
-      card.setAttribute("ondragstart", "removeDragImage()");
-      card.setAttribute("ondrag", "drag(-1, " + deckPos + ")");
+      card.setAttribute("ondragstart", "drag(-1, " + deckPos + ")");
+      card.setAttribute("ondrag", "console.log(event)");
       card.setAttribute("ondragend", "drop()");
       card.setAttribute("ontouchend", "drop()");
       card.setAttribute("ontouchcancel", "drop()");
@@ -195,36 +207,36 @@ function displayDeck(){
 
 function displayCard(i, j){
   if(j == stacks[i].length - 1){
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].src = stacks[i][j].image;
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].draggable = "true";
+    let card = document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j];
+    card.src = stacks[i][j].image;
+    card.draggable = "true";
     // draggble must be set to true to set the drag image to an empty image
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("draggable", "true");
+    card.setAttribute("draggable", "true");
     // drag image can only be set in dragstart event
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ondragstart", "removeDragImage()");
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ondrag", "drag(" + i + ", " + j + ")");
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ondragend", "drop()");
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ontouchmove", "drag(" + i + ", " + j + ")");
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ontouchend", "drop()");
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].setAttribute("ontouchcancel", "drop()");
-    document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j].removeAttribute("onclick");
+    card.setAttribute("ondragstart", "drag(" + i + ", " + j + ")");
+    card.setAttribute("ondrag", "console.log(event)");
+    card.setAttribute("ondragend", "drop()");
+    card.setAttribute("ontouchmove", "drag(" + i + ", " + j + ")");
+    card.setAttribute("ontouchend", "drop()");
+    card.setAttribute("ontouchcancel", "drop()");
+    card.removeAttribute("onclick");
   }
 }
 
-function removeDragImage(){
-  event.dataTransfer.setDragImage(emptyImage, 0, 0);
-  dragPos[0] = event.pageX;
-  dragPos[1] = event.pageY;
-  ghostPos[0] = event.layerX;
-  ghostPos[1] = event.layerY;
-}
-
 function drag(i, j){
+  console.log(event);
   let top = -22;
   if(dropped){
     dropped = false;
     dragged[0] = i;
     dragged[1] = j;
-    if(event.type == "touchmove"){
+    if(event.type == "dragstart"){
+      event.dataTransfer.setDragImage(emptyImage, 0, 0);
+      dragPos[0] = event.pageX;
+      dragPos[1] = event.pageY;
+      ghostPos[0] = event.layerX;
+      ghostPos[1] = event.layerY;
+    }else{
       dragPos[0] = event.changedTouches[0].pageX;
       dragPos[1] = event.changedTouches[0].pageY;
       ghostPos[0] = dragPos[0] - event.srcElement.getBoundingClientRect().x;
@@ -258,16 +270,24 @@ function drag(i, j){
       document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.opacity = "0";
     }
   }
-  if(event.type == "drag"){
-    document.getElementById("ghost").style.top = (dragPos[1] - ghostPos[1]) + "px";
-    document.getElementById("ghost").style.left = (dragPos[0] - ghostPos[0]) + "px";
+}
+
+function allowDrop(){
+  event.preventDefault();
+  if(event.type == "dragover"){
+    dragPos[0] = event.pageX;
+    dragPos[1] = event.pageY;
   }else{
-    document.getElementById("ghost").style.top = (dragPos[1] - ghostPos[1]) + "px";
-    document.getElementById("ghost").style.left = (dragPos[0] - ghostPos[0]) + "px";
+    dragPos[0] = event.changedTouches[0].pageX;
+    dragPos[1] = event.changedTouches[0].pageY;
   }
+  console.log(dragPos, ghostPos);
+  ghost.style.top = (dragPos[1] - ghostPos[1]) + "px";
+  ghost.style.left = (dragPos[0] - ghostPos[0]) + "px";
 }
 
 function drop(){
+  console.log(event);
   if(!dropped){
     let n = document.elementsFromPoint(dragPos[0], dragPos[1]);
     for(let i = 0; i < n.length; i ++){
@@ -292,17 +312,6 @@ function drop(){
   }
   for(let k = 0; k < 2; k ++){
     dragged[k] = -1;
-  }
-}
-
-function allowDrop(){
-  event.preventDefault();
-  if(event.type == "dragover"){
-    dragPos[0] = event.pageX;
-    dragPos[1] = event.pageY;
-  }else{
-    dragPos[0] = event.changedTouches[0].pageX;
-    dragPos[1] = event.changedTouches[0].pageY;
   }
 }
 
@@ -333,18 +342,19 @@ function stackDrop(i){
       }
     }
     if(valid){
+      let card = document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]];
       stacks[i].push(finals[dragged[0] - 7][dragged[1]]);
       finals[dragged[0] - 7].pop();
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.top = (top + 22) + "%";
+      card.style.top = (top + 22) + "%";
       top += 22;
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.opacity = "1";
+      card.style.opacity = "1";
       // draggble must be set to true to set the drag image to an empty image
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("draggable", "true");
+      card.setAttribute("draggable", "true");
       // drag image can only be set in dragstart event
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ondragstart", "removeDragImage()");
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ondrag", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ontouchmove", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
-      document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].appendChild(document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]]);
+      card.setAttribute("ondragstart", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
+      card.setAttribute("ondrag", "console.log(event)");
+      card.setAttribute("ontouchmove", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
+      document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].appendChild(card);
       document.getElementsByClassName("droppable")[i].style.height = document.getElementsByClassName("place")[0].offsetHeight * 2 + 20 * (stacks[i].length - 1) + "px";
       dropped = true;
     }
@@ -369,18 +379,19 @@ function stackDrop(i){
     if(valid){
       let n = stacks[dragged[0]].length;
       for(let j = dragged[1]; j < n; j ++){
+        let card = document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]];
         stacks[i].push(stacks[dragged[0]][dragged[1]]);
         stacks[dragged[0]].splice(dragged[1], 1);
-        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.top = (top + 22) + "%";
+        card.style.top = (top + 22) + "%";
         top += 22;
-        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.opacity = "1";
+        card.style.opacity = "1";
         // draggble must be set to true to set the drag image to an empty image
-        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("draggable", "true");
+        card.setAttribute("draggable", "true");
         // drag image can only be set in dragstart event
-        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ondragstart", "removeDragImage()");
-        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ondrag", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
-        document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ontouchmove", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
-        document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].appendChild(document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]]);
+        card.setAttribute("ondragstart", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
+        card.setAttribute("ondrag", "console.log(event)");
+        card.setAttribute("ontouchmove", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
+        document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].appendChild(card);
         document.getElementsByClassName("droppable")[i].style.height = document.getElementsByClassName("place")[0].offsetHeight * 2 + 20 * (stacks[i].length - 1) + "px";
       }
       dropped = true;
@@ -404,23 +415,26 @@ function stackDrop(i){
       }
     }
     if(valid){
+      let card = document.getElementById("display").getElementsByClassName("place")[0].lastElementChild;
       stacks[i].push(deck[dragged[1]]);
       deck.splice(dragged[1], 1);
       deckPos --;
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.top = (top + 22) + "%";
+      card.style.top = (top + 22) + "%";
       top += 22;
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.left = "0";
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.opacity = "1";
+      card.style.left = "0";
+      card.style.opacity = "1";
       // draggble must be set to true to set the drag image to an empty image
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("draggable", "true");
+      card.setAttribute("draggable", "true");
       // drag image can only be set in dragstart event
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ondragstart", "removeDragImage()");
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ondrag", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ontouchmove", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
-      document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].appendChild(document.getElementById("display").getElementsByClassName("place")[0].lastElementChild);
+      card.setAttribute("ondragstart", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
+      card.setAttribute("ondrag", "console.log(event)");
+      card.setAttribute("ontouchmove", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
+      document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].appendChild(card);
       if(document.getElementById("display").getElementsByClassName("place")[0].children.length > 0){
-        document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ontouchmove", "drag(-1, " + (dragged[1] - 1) + ")");
-        document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.draggable = "true";
+        // enable dragging of next card on display
+        card = document.getElementById("display").getElementsByClassName("place")[0].lastElementChild;
+        card.setAttribute("ontouchmove", "drag(-1, " + (dragged[1] - 1) + ")");
+        card.draggable = "true";
       }
       document.getElementsByClassName("droppable")[i].style.height = document.getElementsByClassName("place")[0].offsetHeight * 2 + 20 * (stacks[i].length - 1) + "px";
       dropped = true;
@@ -441,18 +455,19 @@ function finalDrop(i){
       }
     }
     if(valid){
+      let card = document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]];
       finals[i].push(finals[dragged[0] - 7][dragged[1]]);
       finals[dragged[0] - 7].pop();
       deckPos --;
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.top = "0";
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].style.opacity = "1";
+      card.style.top = "0";
+      card.style.opacity = "1";
       // draggble must be set to true to set the drag image to an empty image
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("draggable", "true");
+      card.setAttribute("draggable", "true");
       // drag image can only be set in dragstart event
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ondragstart", "removeDragImage()");
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ondrag", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
-      document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]].setAttribute("ontouchmove", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
-      document.getElementsByClassName("final")[i].getElementsByClassName("place")[0].appendChild(document.getElementsByClassName("final")[dragged[0] - 7].getElementsByTagName("img")[dragged[1]]);
+      card.setAttribute("ondragstart", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
+      card.setAttribute("ondrag", "console.log(event)");
+      card.setAttribute("ontouchmove", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
+      document.getElementsByClassName("final")[i].getElementsByClassName("place")[0].appendChild(card);
       dropped = true;
     }
   }else if(dragged[0] > -1){
@@ -468,17 +483,18 @@ function finalDrop(i){
       }
     }
     if(valid){
+      let card = document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]];
       finals[i].push(stacks[dragged[0]][dragged[1]]);
       stacks[dragged[0]].pop();
-      document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.top = "0";
-      document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].style.opacity = "1";
+      card.style.top = "0";
+      card.style.opacity = "1";
       // draggble must be set to true to set the drag image to an empty image
-      document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("draggable", "true");
+      card.setAttribute("draggable", "true");
       // drag image can only be set in dragstart event
-      document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ondragstart", "removeDragImage()");
-      document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ondrag", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
-      document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]].setAttribute("ontouchmove", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
-      document.getElementsByClassName("final")[i].getElementsByClassName("place")[0].appendChild(document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]]);
+      card.setAttribute("ondragstart", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
+      card.setAttribute("ondrag", "console.log(event)");
+      card.setAttribute("ontouchmove", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
+      document.getElementsByClassName("final")[i].getElementsByClassName("place")[0].appendChild(card);
       dropped = true;
     }
   }else{
@@ -492,22 +508,25 @@ function finalDrop(i){
       }
     }
     if(valid){
+      let card = document.getElementById("display").getElementsByClassName("place")[0].lastElementChild;
       finals[i].push(deck[dragged[1]]);
       deck.splice(dragged[1], 1);
       deckPos --;
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.top = "0";
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.left = "0";
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.style.opacity = "1";
+      card.style.top = "0";
+      card.style.left = "0";
+      card.style.opacity = "1";
       // draggble must be set to true to set the drag image to an empty image
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("draggable", "true");
+      card.setAttribute("draggable", "true");
       // drag image can only be set in dragstart event
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ondragstart", "removeDragImage()");
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ondrag", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
-      document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ontouchmove", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
-      document.getElementsByClassName("final")[i].getElementsByClassName("place")[0].appendChild(document.getElementById("display").getElementsByClassName("place")[0].lastElementChild);
+      card.setAttribute("ondragstart", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
+      card.setAttribute("ondrag", "console.log(event)");
+      card.setAttribute("ontouchmove", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
+      document.getElementsByClassName("final")[i].getElementsByClassName("place")[0].appendChild(card);
       if(document.getElementById("display").getElementsByClassName("place")[0].children.length > 0){
-        document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.setAttribute("ontouchmove", "drag(-1, " + (dragged[1] - 1) + ")");
-        document.getElementById("display").getElementsByClassName("place")[0].lastElementChild.draggable = "true";
+        // enable dragging of next card on display
+        card = document.getElementById("display").getElementsByClassName("place")[0].lastElementChild;
+        card.setAttribute("ontouchmove", "drag(-1, " + (dragged[1] - 1) + ")");
+        card.draggable = "true";
       }
       dropped = true;
     }
