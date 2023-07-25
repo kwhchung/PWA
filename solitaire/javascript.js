@@ -96,7 +96,6 @@ const start = () => {
         card.setAttribute("draggable", "true");
         // drag image can only be set in dragstart event
         card.setAttribute("ondragstart", "drag(" + i + ", " + j + ")");
-        card.setAttribute("ondrag", "console.log(event)");
         card.setAttribute("ondragend", "drop()");
         card.setAttribute("ontouchmove", "drag(" + i + ", " + j + ")");
         card.setAttribute("ontouchend", "drop()");
@@ -144,7 +143,6 @@ function displayDeck(){
       card.setAttribute("draggable", "true");
       // drag image can only be set in dragstart event
       card.setAttribute("ondragstart", "drag(-1, " + deckPos + ")");
-      card.setAttribute("ondrag", "console.log(event)");
       card.setAttribute("ondragend", "drop()");
       card.setAttribute("ontouchmove", "drag(-1, " + deckPos + ")");
       card.setAttribute("ontouchend", "drop()");
@@ -177,7 +175,6 @@ function displayDeck(){
       card.setAttribute("draggable", "true");
       // drag image can only be set in dragstart event
       card.setAttribute("ondragstart", "drag(-1, " + deckPos + ")");
-      card.setAttribute("ondrag", "console.log(event)");
       card.setAttribute("ondragend", "drop()");
       card.setAttribute("ontouchend", "drop()");
       card.setAttribute("ontouchcancel", "drop()");
@@ -214,7 +211,6 @@ function displayCard(i, j){
     card.setAttribute("draggable", "true");
     // drag image can only be set in dragstart event
     card.setAttribute("ondragstart", "drag(" + i + ", " + j + ")");
-    card.setAttribute("ondrag", "console.log(event)");
     card.setAttribute("ondragend", "drop()");
     card.setAttribute("ontouchmove", "drag(" + i + ", " + j + ")");
     card.setAttribute("ontouchend", "drop()");
@@ -224,7 +220,6 @@ function displayCard(i, j){
 }
 
 function drag(i, j){
-  console.log(event);
   let top = -22;
   if(dropped){
     dropped = false;
@@ -281,13 +276,11 @@ function allowDrop(){
     dragPos[0] = event.changedTouches[0].pageX;
     dragPos[1] = event.changedTouches[0].pageY;
   }
-  console.log(dragPos, ghostPos);
   ghost.style.top = (dragPos[1] - ghostPos[1]) + "px";
   ghost.style.left = (dragPos[0] - ghostPos[0]) + "px";
 }
 
 function drop(){
-  console.log(event);
   if(!dropped){
     let n = document.elementsFromPoint(dragPos[0], dragPos[1]);
     for(let i = 0; i < n.length; i ++){
@@ -352,7 +345,6 @@ function stackDrop(i){
       card.setAttribute("draggable", "true");
       // drag image can only be set in dragstart event
       card.setAttribute("ondragstart", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
-      card.setAttribute("ondrag", "console.log(event)");
       card.setAttribute("ontouchmove", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
       document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].appendChild(card);
       document.getElementsByClassName("droppable")[i].style.height = document.getElementsByClassName("place")[0].offsetHeight * 2 + 20 * (stacks[i].length - 1) + "px";
@@ -389,7 +381,6 @@ function stackDrop(i){
         card.setAttribute("draggable", "true");
         // drag image can only be set in dragstart event
         card.setAttribute("ondragstart", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
-        card.setAttribute("ondrag", "console.log(event)");
         card.setAttribute("ontouchmove", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
         document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].appendChild(card);
         document.getElementsByClassName("droppable")[i].style.height = document.getElementsByClassName("place")[0].offsetHeight * 2 + 20 * (stacks[i].length - 1) + "px";
@@ -427,7 +418,6 @@ function stackDrop(i){
       card.setAttribute("draggable", "true");
       // drag image can only be set in dragstart event
       card.setAttribute("ondragstart", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
-      card.setAttribute("ondrag", "console.log(event)");
       card.setAttribute("ontouchmove", "drag(" + i + ", " + (stacks[i].length - 1) + ")");
       document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].appendChild(card);
       if(document.getElementById("display").getElementsByClassName("place")[0].children.length > 0){
@@ -465,7 +455,6 @@ function finalDrop(i){
       card.setAttribute("draggable", "true");
       // drag image can only be set in dragstart event
       card.setAttribute("ondragstart", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
-      card.setAttribute("ondrag", "console.log(event)");
       card.setAttribute("ontouchmove", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
       document.getElementsByClassName("final")[i].getElementsByClassName("place")[0].appendChild(card);
       dropped = true;
@@ -492,7 +481,6 @@ function finalDrop(i){
       card.setAttribute("draggable", "true");
       // drag image can only be set in dragstart event
       card.setAttribute("ondragstart", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
-      card.setAttribute("ondrag", "console.log(event)");
       card.setAttribute("ontouchmove", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
       document.getElementsByClassName("final")[i].getElementsByClassName("place")[0].appendChild(card);
       dropped = true;
@@ -519,7 +507,6 @@ function finalDrop(i){
       card.setAttribute("draggable", "true");
       // drag image can only be set in dragstart event
       card.setAttribute("ondragstart", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
-      card.setAttribute("ondrag", "console.log(event)");
       card.setAttribute("ontouchmove", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
       document.getElementsByClassName("final")[i].getElementsByClassName("place")[0].appendChild(card);
       if(document.getElementById("display").getElementsByClassName("place")[0].children.length > 0){
