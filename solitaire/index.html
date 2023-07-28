@@ -123,13 +123,16 @@
     </table>
     <div id = "end"></div>
   </main>
-  <div id = "selectMode">
-    <label for = "mode">Mode: </label>
-    <select id = "mode">
-      <option value = "1" selected>1 card</option>
-      <option value = "3">3 cards</option>
-    </select>
-    <button id = "restart" onclick = "restart()">Restart</button>
+  <div id = "menu">
+    <button id = "undo" onclick = "undo()" disabled>Undo</button>
+    <div id = "selectMode">
+      <label for = "mode">Mode: </label>
+      <select id = "mode">
+        <option value = "1" selected>1 card</option>
+        <option value = "3">3 cards</option>
+      </select>
+      <button id = "restart" onclick = "restart()">Restart</button>
+    </div>
   </div>
   <div id = "ghost">
     <div id = "ghostPlace"></div>
