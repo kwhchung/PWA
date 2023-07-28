@@ -12,6 +12,17 @@ class Card{
   }
 }
 
+class Action{
+  constructor(type, fromi, fromj, toi, toj){
+    // 1 = undisplay a card in a stack, 2 = undisplay a card in the deck, 3 = move a card back to a stack, 4 = move a card back to a final stack, 5 = move a card back to the deck
+    this.type = type;
+    this.fromi = fromi;
+    this.fromj = fromj;
+    this.toi = toi;
+    this.toj = toj;
+  }
+}
+
 // collection of all 52 cards objects
 const cards = [];
 // possible types of the cards
@@ -24,6 +35,8 @@ const finals = [[], [], [], []];
 const stacks = [[], [], [], [], [], [], []];
 // store the cards that are already picked, used for random distribution of the cards at the start of a game
 const picked = [];
+//
+const actions = [];
 // [i, j] = position of the dragged card, i = index of stack, j = index of card in that stack
 const dragged = [-1, -1];
 // [x, y] = position of dragged point in the card
@@ -89,17 +102,17 @@ const start = () => {
       card.setAttribute("height", "100%");
       card.style.position = "absolute";
       card.style.top = (8 * j) + "%";
+      // drag image can only be set in dragstart event
+      card.setAttribute("ondragstart", "drag(" + i + ", " + j + ")");
+      card.setAttribute("ondragend", "drop()");
+      card.setAttribute("ontouchend", "drop()");
+      card.setAttribute("ontouchcancel", "drop()");
       if(stacks[i][j].display){
         // display the image of the card
         card.src = stacks[i][j].image;
         // draggble must be set to true to set the drag image to an empty image
         card.setAttribute("draggable", "true");
-        // drag image can only be set in dragstart event
-        card.setAttribute("ondragstart", "drag(" + i + ", " + j + ")");
-        card.setAttribute("ondragend", "drop()");
         card.setAttribute("ontouchmove", "drag(" + i + ", " + j + ")");
-        card.setAttribute("ontouchend", "drop()");
-        card.setAttribute("ontouchcancel", "drop()");
       }else{
         // display the image of the back of the card
         card.src = "images/back.png";
@@ -118,6 +131,7 @@ const start = () => {
     do{
       n = Math.floor(Math.random() * 52);
     }while(picked.includes(n));
+    cards[n].display = true;
     deck.push(cards[n]);
     picked.push(n);
   }
@@ -126,13 +140,15 @@ const start = () => {
 
 start();
 
-function displayDeck(){
+const displayDeck = () => {
+  let display = document.getElementById("display").getElementsByClassName("place")[0];
   if(mode == 0){
     deckPos ++;
     if(deckPos >= 0 && deckPos < deck.length){
       if(deckPos > 0){
-        document.getElementById("display").getElementsByTagName("img")[deckPos - 1].setAttribute("draggable", "false");
-        document.getElementById("display").getElementsByTagName("img")[deckPos - 1].removeAttribute("ontouchmove");
+        let card = document.getElementById("display").getElementsByTagName("img")[deckPos - 1];
+        card.setAttribute("draggable", "false");
+        card.removeAttribute("ontouchmove");
       }
       let card = document.createElement("img");
       card.src = deck[deckPos].image;
@@ -147,19 +163,25 @@ function displayDeck(){
       card.setAttribute("ontouchmove", "drag(-1, " + deckPos + ")");
       card.setAttribute("ontouchend", "drop()");
       card.setAttribute("ontouchcancel", "drop()");
-      document.getElementById("display").getElementsByClassName("place")[0].appendChild(card);
+      display.appendChild(card);
     }
     if(deckPos == deck.length - 1){
       document.getElementById("deck").getElementsByClassName("place")[0].innerHTML = "";
-    }else if(deckPos == deck.length){
+    }else
+    if(deckPos == deck.length){
       deckPos = -1;
       if(deck.length > 0){
         document.getElementById("deck").getElementsByClassName("place")[0].innerHTML = "<img src = 'images/back.png' width = '100%' height = '100%' draggable = 'false'>";
       }
-      document.getElementById("display").getElementsByClassName("place")[0].innerHTML = "";
+      display.innerHTML = "";
+    }
+    if(deck.length > 0){
+      actions.push(new Action(2, 0));
+      document.getElementById("undo").disabled = false;
     }
   }else{
-    document.getElementById("display").getElementsByClassName("place")[0].innerHTML = "";
+    let n = display.childElementCount;
+    display.innerHTML = "";
     for(let i = 0; i < 3; i ++){
       deckPos ++;
       if(deckPos == deck.length){
@@ -170,20 +192,20 @@ function displayDeck(){
       card.setAttribute("width", "100%");
       card.setAttribute("height", "100%");
       card.style.position = "absolute";
-      card.style.left = 30 * i + "%";
-      // draggble must be set to true to set the drag image to an empty image
-      card.setAttribute("draggable", "true");
+      card.style.left = (30 * i) + "%";
       // drag image can only be set in dragstart event
       card.setAttribute("ondragstart", "drag(-1, " + deckPos + ")");
       card.setAttribute("ondragend", "drop()");
       card.setAttribute("ontouchend", "drop()");
       card.setAttribute("ontouchcancel", "drop()");
       if(i == 2 || deckPos == deck.length - 1){
+        // draggble must be set to true to set the drag image to an empty image
+        card.setAttribute("draggable", "true");
         card.setAttribute("ontouchmove", "drag(-1, " + deckPos + ")");
       }else{
         card.setAttribute("draggable", "false");
       }
-      document.getElementById("display").getElementsByClassName("place")[0].appendChild(card);
+      display.appendChild(card);
       if(deckPos == deck.length - 1){
         break;
       }
@@ -196,26 +218,27 @@ function displayDeck(){
       if(deck.length > 0){
         document.getElementById("deck").getElementsByClassName("place")[0].innerHTML = "<img src = 'images/back.png' width = '100%' height = '100%' draggable = 'false'>";
       }
-      document.getElementById("display").getElementsByClassName("place")[0].innerHTML = "";
+      display.innerHTML = "";
+    }
+    if(deck.length > 0){
+      actions.push(new Action(2, n));
+      document.getElementById("undo").disabled = false;
     }
   }
-
 }
 
 function displayCard(i, j){
   if(j == stacks[i].length - 1){
+    stacks[i][j].display = true;
     let card = document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j];
     card.src = stacks[i][j].image;
     card.draggable = "true";
     // draggble must be set to true to set the drag image to an empty image
     card.setAttribute("draggable", "true");
-    // drag image can only be set in dragstart event
-    card.setAttribute("ondragstart", "drag(" + i + ", " + j + ")");
-    card.setAttribute("ondragend", "drop()");
     card.setAttribute("ontouchmove", "drag(" + i + ", " + j + ")");
-    card.setAttribute("ontouchend", "drop()");
-    card.setAttribute("ontouchcancel", "drop()");
     card.removeAttribute("onclick");
+    actions.push(new Action(1, i, j));
+    document.getElementById("undo").disabled = false;
   }
 }
 
@@ -269,15 +292,17 @@ function drag(i, j){
 
 function allowDrop(){
   event.preventDefault();
-  if(event.type == "dragover"){
-    dragPos[0] = event.pageX;
-    dragPos[1] = event.pageY;
-  }else{
-    dragPos[0] = event.changedTouches[0].pageX;
-    dragPos[1] = event.changedTouches[0].pageY;
+  if(!dropped){
+    if(event.type == "dragover"){
+      dragPos[0] = event.pageX;
+      dragPos[1] = event.pageY;
+    }else{
+      dragPos[0] = event.changedTouches[0].pageX;
+      dragPos[1] = event.changedTouches[0].pageY;
+    }
+    ghost.style.top = (dragPos[1] - ghostPos[1]) + "px";
+    ghost.style.left = (dragPos[0] - ghostPos[0]) + "px";
   }
-  ghost.style.top = (dragPos[1] - ghostPos[1]) + "px";
-  ghost.style.left = (dragPos[0] - ghostPos[0]) + "px";
 }
 
 function drop(){
@@ -349,6 +374,8 @@ function stackDrop(i){
       document.getElementsByClassName("stack")[i].getElementsByClassName("place")[0].appendChild(card);
       document.getElementsByClassName("droppable")[i].style.height = document.getElementsByClassName("place")[0].offsetHeight * 2 + 20 * (stacks[i].length - 1) + "px";
       dropped = true;
+      actions.push(new Action(4, dragged[0] - 7, dragged[1], i, stacks[i].length - 1));
+      document.getElementById("undo").disabled = false;
     }
   }else if(dragged[0] > -1){
     if(stacks[i].length > 0){
@@ -370,6 +397,7 @@ function stackDrop(i){
     }
     if(valid){
       let n = stacks[dragged[0]].length;
+      let m = stacks[i].length;
       for(let j = dragged[1]; j < n; j ++){
         let card = document.getElementsByClassName("stack")[dragged[0]].getElementsByTagName("img")[dragged[1]];
         stacks[i].push(stacks[dragged[0]][dragged[1]]);
@@ -386,6 +414,8 @@ function stackDrop(i){
         document.getElementsByClassName("droppable")[i].style.height = document.getElementsByClassName("place")[0].offsetHeight * 2 + 20 * (stacks[i].length - 1) + "px";
       }
       dropped = true;
+      actions.push(new Action(3, dragged[0], dragged[1], i, m));
+      document.getElementById("undo").disabled = false;
     }
   }else{
     if(stacks[i].length > 0){
@@ -428,6 +458,8 @@ function stackDrop(i){
       }
       document.getElementsByClassName("droppable")[i].style.height = document.getElementsByClassName("place")[0].offsetHeight * 2 + 20 * (stacks[i].length - 1) + "px";
       dropped = true;
+      actions.push(new Action(5, dragged[0], dragged[1], i, stacks[i].length - 1));
+      document.getElementById("undo").disabled = false;
     }
   }
 }
@@ -449,7 +481,7 @@ function finalDrop(i){
       finals[i].push(finals[dragged[0] - 7][dragged[1]]);
       finals[dragged[0] - 7].pop();
       deckPos --;
-      card.style.top = "0";
+      //card.style.top = "0";
       card.style.opacity = "1";
       // draggble must be set to true to set the drag image to an empty image
       card.setAttribute("draggable", "true");
@@ -458,6 +490,8 @@ function finalDrop(i){
       card.setAttribute("ontouchmove", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
       document.getElementsByClassName("final")[i].getElementsByClassName("place")[0].appendChild(card);
       dropped = true;
+      actions.push(new Action(4, dragged[0] - 7, dragged[1], i + 7, finals[i].length - 1));
+      document.getElementById("undo").disabled = false;
     }
   }else if(dragged[0] > -1){
     if(dragged[1] == stacks[dragged[0]].length - 1){
@@ -484,6 +518,8 @@ function finalDrop(i){
       card.setAttribute("ontouchmove", "drag(" + (i + 7) + ", " + (finals[i].length - 1) + ")");
       document.getElementsByClassName("final")[i].getElementsByClassName("place")[0].appendChild(card);
       dropped = true;
+      actions.push(new Action(3, dragged[0], dragged[1], i + 7, finals[i].length - 1));
+      document.getElementById("undo").disabled = false;
     }
   }else{
     if(finals[i].length > 0){
@@ -500,7 +536,7 @@ function finalDrop(i){
       finals[i].push(deck[dragged[1]]);
       deck.splice(dragged[1], 1);
       deckPos --;
-      card.style.top = "0";
+      //card.style.top = "0";
       card.style.left = "0";
       card.style.opacity = "1";
       // draggble must be set to true to set the drag image to an empty image
@@ -516,11 +552,210 @@ function finalDrop(i){
         card.draggable = "true";
       }
       dropped = true;
+      actions.push(new Action(5, dragged[0], dragged[1], i + 7, finals[i].length - 1));
+      document.getElementById("undo").disabled = false;
     }
   }
   if(win()){
     end();
   }
+}
+
+const undo = () => {
+  let action = actions[actions.length - 1];
+  actions.pop();
+  if(actions.length == 0){
+    document.getElementById("undo").disabled = true;
+  }
+  switch(action.type){
+    case 1:
+      undisplayCard(action.fromi, action.fromj);
+      break;
+    case 2:
+      undisplayDeck(action.fromi);
+      break;
+    case 3:
+      stackUndo(action.fromi, action.fromj, action.toi, action.toj);
+      break;
+    case 4:
+      finalUndo(action.fromi, action.fromj, action.toi, action.toj);
+      break;
+    case 5:
+      deckUndo(action.fromi, action.fromj, action.toi, action.toj);
+  }
+}
+
+const undisplayCard = (i, j) => {
+  stacks[i][j].display = false;
+  let card = document.getElementsByClassName("stack")[i].getElementsByTagName("img")[j];
+  // display the image of the back of the card
+  card.src = "images/back.png";
+  // disable dragging of undisplayed card
+  card.setAttribute("draggable", "false");
+  card.removeAttribute("ontouchmove");
+  // click to display the card
+  card.setAttribute("onclick", "displayCard(" + i + ", " + j + ")");
+}
+
+const undisplayDeck = n => {
+  let display = document.getElementById("display").getElementsByClassName("place")[0];
+  if(mode == 0){
+    if(deckPos == -1){
+      deckPos = deck.length - 1;
+      for(let i = 0; i < deck.length; i ++){
+        let card = document.createElement("img");
+        card.src = deck[i].image;
+        card.setAttribute("width", "100%");
+        card.setAttribute("height", "100%");
+        card.style.position = "absolute";
+        // draggble must be set to true to set the drag image to an empty image
+        card.setAttribute("draggable", "true");
+        // drag image can only be set in dragstart event
+        card.setAttribute("ondragstart", "drag(-1, " + i + ")");
+        card.setAttribute("ondragend", "drop()");
+        card.setAttribute("ontouchmove", "drag(-1, " + i + ")");
+        card.setAttribute("ontouchend", "drop()");
+        card.setAttribute("ontouchcancel", "drop()");
+        display.appendChild(card);
+      }
+      document.getElementById("deck").getElementsByClassName("place")[0].innerHTML = "";
+    }else{
+      deckPos --;
+      display.removeChild(display.lastElementChild);
+      if(deckPos >= 0){
+        let card = document.getElementById("display").getElementsByTagName("img")[deckPos];
+        card.setAttribute("draggable", "true");
+        card.setAttribute("ontouchmove", "drag(-1, " + deckPos + ")");
+      }
+      if(deckPos == deck.length - 2){
+        document.getElementById("deck").getElementsByClassName("place")[0].innerHTML = "<img src = 'images/back.png' width = '100%' height = '100%' draggable = 'false'>";
+      }
+    }
+  }else{
+    if(deckPos == -1){
+      document.getElementById("deck").getElementsByClassName("place")[0].innerHTML = "";
+      deckPos = deck.length - 1;
+    }else{
+      if(deckPos == deck.length - 1){
+        document.getElementById("deck").getElementsByClassName("place")[0].innerHTML = "<img src = 'images/back.png' width = '100%' height = '100%' draggable = 'false'>";
+      }
+      deckPos = Math.max(-1, deckPos - display.childElementCount);
+    }
+    display.innerHTML = "";
+    for(let i = deckPos - n + 1; i <= deckPos; i ++){
+      let card = document.createElement("img");
+      card.src = deck[i].image;
+      card.setAttribute("width", "100%");
+      card.setAttribute("height", "100%");
+      card.style.position = "absolute";
+      card.style.left = 30 * (i - deckPos + n - 1) + "%";
+      // draggble must be set to true to set the drag image to an empty image
+      card.setAttribute("draggable", "true");
+      // drag image can only be set in dragstart event
+      card.setAttribute("ondragstart", "drag(-1, " + i + ")");
+      card.setAttribute("ondragend", "drop()");
+      card.setAttribute("ontouchend", "drop()");
+      card.setAttribute("ontouchcancel", "drop()");
+      if(i == deckPos){
+        card.setAttribute("ontouchmove", "drag(-1, " + i + ")");
+      }else{
+        card.setAttribute("draggable", "false");
+      }
+      display.appendChild(card);
+    }
+  }
+}
+
+const stackUndo = (fromi, fromj, toi, toj) => {
+  let top;
+  if(stacks[fromi].length > 0){
+    top = parseInt(document.getElementsByClassName("stack")[fromi].getElementsByClassName("place")[0].lastElementChild.style.top);
+    if(!stacks[fromi][stacks[fromi].length - 1].display){
+      top -= 14;
+    }
+  }else{
+    top = -22;
+  }
+  if(toi > 6){
+    let card = document.getElementsByClassName("final")[toi - 7].getElementsByTagName("img")[toj];
+    stacks[fromi].push(finals[toi - 7][toj]);
+    finals[toi - 7].pop();
+    card.style.top = (top + 22) + "%";
+    top += 22;
+    card.style.opacity = "1";
+    // draggble must be set to true to set the drag image to an empty image
+    card.setAttribute("draggable", "true");
+    // drag image can only be set in dragstart event
+    card.setAttribute("ondragstart", "drag(" + fromi + ", " + fromj + ")");
+    card.setAttribute("ontouchmove", "drag(" + fromi + ", " + fromj + ")");
+    document.getElementsByClassName("stack")[fromi].getElementsByClassName("place")[0].appendChild(card);
+    document.getElementsByClassName("droppable")[fromi].style.height = document.getElementsByClassName("place")[0].offsetHeight * 2 + 20 * fromj + "px";
+  }else{
+    let n = stacks[toi].length;
+    for(let j = toj; j < n; j ++){
+      let card = document.getElementsByClassName("stack")[toi].getElementsByTagName("img")[toj];
+      stacks[fromi].push(stacks[toi][toj]);
+      stacks[toi].splice(toj, 1);
+      card.style.top = (top + 22) + "%";
+      top += 22;
+      card.style.opacity = "1";
+      // draggble must be set to true to set the drag image to an empty image
+      card.setAttribute("draggable", "true");
+      // drag image can only be set in dragstart event
+      card.setAttribute("ondragstart", "drag(" + fromi + ", " + (stacks[fromi].length - 1) + ")");
+      card.setAttribute("ontouchmove", "drag(" + fromi + ", " + (stacks[fromi].length - 1) + ")");
+      document.getElementsByClassName("stack")[fromi].getElementsByClassName("place")[0].appendChild(card);
+      document.getElementsByClassName("droppable")[fromi].style.height = document.getElementsByClassName("place")[0].offsetHeight * 2 + 20 * fromj + "px";
+    }
+  }
+}
+
+const finalUndo = (fromi, fromj, toi, toj) => {
+  let card;
+  if(toi > 6){
+    card = document.getElementsByClassName("final")[toi - 7].getElementsByTagName("img")[toj];
+    finals[fromi].push(finals[toi - 7][toj]);
+    finals[toi - 7].pop();
+  }else{
+    card = document.getElementsByClassName("stack")[toi].getElementsByTagName("img")[toj];
+    finals[fromi].push(stacks[toi][toj]);
+    stacks[toi].pop();
+  }
+  card.style.top = "0";
+  card.style.opacity = "1";
+  // draggble must be set to true to set the drag image to an empty image
+  card.setAttribute("draggable", "true");
+  // drag image can only be set in dragstart event
+  card.setAttribute("ondragstart", "drag(" + (fromi + 7) + ", " + fromj + ")");
+  card.setAttribute("ontouchmove", "drag(" + (fromi + 7) + ", " + fromj + ")");
+  document.getElementsByClassName("final")[fromi].getElementsByClassName("place")[0].appendChild(card);
+}
+
+const deckUndo = (fromi, fromj, toi, toj) => {
+  let display = document.getElementById("display").getElementsByClassName("place")[0];
+  let card;
+  if(toi > 6){
+    card = document.getElementsByClassName("final")[toi - 7].getElementsByTagName("img")[toj];
+    deck.splice(deckPos + 1, 0, finals[toi - 7][toj]);
+    finals[toi - 7].pop();
+  }else{
+    card = document.getElementsByClassName("stack")[toi].getElementsByTagName("img")[toj];
+    deck.splice(deckPos + 1, 0, stacks[toi][toj]);
+    stacks[toi].pop();
+    card.style.top = "0";
+  }
+  deckPos ++;
+  card.setAttribute("ondragstart", "drag(-1, " + deckPos + ")");
+  card.setAttribute("ontouchmove", "drag(-1, " + deckPos + ")");
+  if(mode == 1){
+    let n = display.childElementCount;
+    if(n > 0){
+      display.lastElementChild.setAttribute("draggable", "false");
+      display.lastElementChild.removeAttribute("ontouchmove");
+    }
+    card.style.left = (30 * n) + "%";
+  }
+  display.appendChild(card);
 }
 
 function win(){
@@ -575,8 +810,10 @@ function restart(){
   aIncreased = false;
   document.getElementById("end").innerHTML = "";
   document.getElementById("end").style.display = "none";
+  document.getElementById("undo").disabled = true;
   picked.splice(0, picked.length);
   deck.splice(0, deck.length);
+  actions.splice(0, actions.length);
   deckPos = -1;
   if(document.getElementsByTagName("option")[0].selected == true){
     mode = 0;
