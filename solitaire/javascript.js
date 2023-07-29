@@ -43,6 +43,8 @@ const dragged = [-1, -1];
 const ghostPos = [-1, -1];
 // [x, y] = position of dragged point in the page
 const dragPos = [-1, -1];
+//
+const endPos = [0, 12];
 // empty Image object for invisibility of the drag image
 const emptyImage = new Image();
 //
@@ -51,14 +53,15 @@ const mainRect = document.getElementsByTagName("main")[0].getBoundingClientRect(
 let deckPos = -1;
 // record whether the dragging card is dropped
 let dropped = true;
-//
-let endPos = 0;
 let endInterval = 0;
 let x = 0;
 let y = 0;
 let a = 1;
+let b = 1;
+let prevY = 0;
 let endRect = 0;
 let aIncreased = false;
+let aDecrease = 1;
 let mode = 0;
 
 // register sevice worker to enable PWA features
@@ -769,35 +772,53 @@ function win(){
 
 function end(){
   document.getElementById("end").style.display = "block";
-  endRect = document.getElementsByClassName("final")[endPos].getElementsByClassName("place")[0].getBoundingClientRect();
+  endRect = document.getElementsByClassName("final")[endPos[0]].getElementsByClassName("place")[0].getBoundingClientRect();
+  aDecrease = Math.random() * 0.3 + 0.5;
+  b = Math.random() * mainRect.width / 400 + 0.5;
   x = endRect.x - mainRect.x;
   endInterval = setInterval(endAnimation, 10);
 }
 
 function endAnimation(){
-  y = mainRect.height - endRect.height - a * Math.abs(Math.cos((x - endRect.x + mainRect.x - 1) / (mainRect.height - endRect.height - endRect.y + mainRect.y) * 10)) * (mainRect.height - endRect.height - endRect.y + mainRect.y);
-  if(!aIncreased && y >= mainRect.height - endRect.height - 15){
-    a *= 2/3;
+  prevY = y;
+  y = mainRect.height - endRect.height - a * Math.abs(Math.cos((x - endRect.x + mainRect.x - 1) / (mainRect.height - endRect.height - endRect.y + mainRect.y) / b * 10)) * (mainRect.height - endRect.height - endRect.y + mainRect.y);
+  if(!aIncreased && y < prevY){
+    a *= aDecrease;
     aIncreased = true;
-  }else if(y < mainRect.height - endRect.height - 15){
+    y = mainRect.height - endRect.height - a * Math.abs(Math.cos((x - endRect.x + mainRect.x - 1) / (mainRect.height - endRect.height - endRect.y + mainRect.y) / b * 10)) * (mainRect.height - endRect.height - endRect.y + mainRect.y);
+  }else if(y >= prevY){
     aIncreased = false;
   }
+  /*if(!aIncreased && y >= mainRect.height - endRect.height - 5){
+    a *= 2/3;
+    aIncreased = true;
+  }else if(y < mainRect.height - endRect.height - 5){
+    aIncreased = false;
+  }*/
   let card = document.createElement("img");
-  card.src = finals[endPos][finals[endPos].length - 1].image;
+  card.src = finals[endPos[0]][endPos[1]].image;
   card.setAttribute("width", endRect.width + "px");
   card.setAttribute("height", endRect.height + "px");
   card.style.position = "absolute";
   card.style.top = y + "px";
   card.style.left = x + "px";
   document.getElementById("end").appendChild(card);
-  x --;
+  x -= mainRect.width / 300;
   if(x < -endRect.width){
     clearInterval(endInterval);
-    endPos ++;
-    if(endPos < 4){
-      endRect = document.getElementsByClassName("final")[endPos].getElementsByClassName("place")[0].getBoundingClientRect();
+    endPos[0] ++;
+    if(endPos[0] >= 4){
+      endPos[1] --;
+      endPos[0] = 0;
+    }
+    if(endPos[1] > -1){
+      endRect = document.getElementsByClassName("final")[endPos[0]].getElementsByClassName("place")[0].getBoundingClientRect();
       x = endRect.x - mainRect.x;
+      y = 0;
+      prevY = 0;
       a = 1;
+      aDecrease = Math.random() * 0.3 + 0.5;
+      b = Math.random() * mainRect.width / 400 + 0.5;
       endInterval = setInterval(endAnimation, 10);
     }
   }
@@ -805,7 +826,8 @@ function endAnimation(){
 
 function restart(){
   clearInterval(endInterval);
-  endPos = 0;
+  endPos[0] = 0;
+  endPos[1] = 12;
   a = 1;
   aIncreased = false;
   document.getElementById("end").innerHTML = "";
