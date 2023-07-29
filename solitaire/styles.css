@@ -4,7 +4,7 @@
   --horizontal-padding: 1vw;
   --vertical-padding: 2vh;
   --card-width: calc((var(--main-width) - var(--horizontal-padding) * 2) / 7 - var(--horizontal-padding) * 2);
-  --font-size: min(5vw, 20px);
+  --font-size: min(5vw, 25px);
 }
 
 *{
