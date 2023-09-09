@@ -1138,6 +1138,7 @@ const restart = () => {
   // reset the variables
   endPos[0] = 0;
   endPos[1] = 12;
+  prevY = 0;
   a = 1;
   aDecreased = false;
   // clear and hide the plane for the ending animation
